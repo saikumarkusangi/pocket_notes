@@ -6,14 +6,29 @@ import 'package:pocket_notes/core/constants/app_constants.dart';
 import 'package:pocket_notes/core/constants/app_images.dart';
 import 'package:pocket_notes/features/home/presentation/widgets/home_app_bar.dart';
 import 'package:pocket_notes/features/home/presentation/widgets/home_category_card.dart';
+import 'package:pocket_notes/features/home/providers/home_category_subtitle_provider.dart';
+import 'package:pocket_notes/features/notes/data/models/note_category.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final quickNotesSubtitle = ref.watch(
+      homeCategorySubtitleProvider(NoteCategory.quickNotes),
+    );
+    final journalSubtitle = ref.watch(
+      homeCategorySubtitleProvider(NoteCategory.journal),
+    );
+    final shoppingSubtitle = ref.watch(
+      homeCategorySubtitleProvider(NoteCategory.shoppingList),
+    );
+    final todoSubtitle = ref.watch(
+      homeCategorySubtitleProvider(NoteCategory.todoList),
+    );
+
     return Scaffold(
-      backgroundColor: AppColors.notesListBackground,
+      backgroundColor: AppColors.white,
       appBar: const HomeAppBar(),
       body: SafeArea(
         child: Padding(
@@ -22,24 +37,22 @@ class HomeScreen extends ConsumerWidget {
             child: Column(
               children: [
                 const SizedBox(height: 30),
-                // Quick Notes
                 HomeCategoryCard(
                   title: 'Quick Notes',
-                  subtitle: 'Last updated: 15 Jun, 26',
+                  subtitle: quickNotesSubtitle,
                   backgroundColor: Colors.blue.shade100,
                   imageAsset: AppImages.quickNotes,
-                  imageWidth: 190,
-                  imageHeight: 190,
-                  imageBottom: -50,
-                  imageRight: -40,
+                  imageWidth: 170,
+                  imageHeight: 170,
+                  imageBottom: -30,
+                  imageRight: -30,
                   rotation: 6.96,
+                  onTap: () => context.push(AppConstants.quickNotesListRoute),
                 ),
-                SizedBox(height: 16),
-
-                // Journal
+                const SizedBox(height: 16),
                 HomeCategoryCard(
                   title: 'Journal',
-                  subtitle: 'Last updated: 15 Jun, 26',
+                  subtitle: journalSubtitle,
                   backgroundColor: Colors.cyan.shade100,
                   imageAsset: AppImages.journal,
                   rotation: 6.96,
@@ -49,12 +62,10 @@ class HomeScreen extends ConsumerWidget {
                   imageRight: -8,
                   onTap: () => context.push(AppConstants.notesListRoute),
                 ),
-                SizedBox(height: 16),
-
-                // Shopping List
+                const SizedBox(height: 16),
                 HomeCategoryCard(
                   title: 'Shopping List',
-                  subtitle: '2 items left',
+                  subtitle: shoppingSubtitle,
                   backgroundColor: Colors.orange.shade100,
                   imageAsset: AppImages.shopping,
                   imageWidth: 160,
@@ -62,14 +73,12 @@ class HomeScreen extends ConsumerWidget {
                   imageBottom: -40,
                   imageRight: -20,
                   rotation: 6.96,
+                  onTap: () => context.push(AppConstants.shoppingListRoute),
                 ),
-
-                SizedBox(height: 16),
-
-                // To-Do List
+                const SizedBox(height: 16),
                 HomeCategoryCard(
                   title: 'To-Do List',
-                  subtitle: 'Last updated: 15 Jun, 26',
+                  subtitle: todoSubtitle,
                   backgroundColor: Colors.green.shade100,
                   imageAsset: AppImages.toDoList,
                   imageWidth: 150,
@@ -77,6 +86,7 @@ class HomeScreen extends ConsumerWidget {
                   imageBottom: -20,
                   imageRight: -20,
                   rotation: 6.96,
+                  onTap: () => context.push(AppConstants.todoListRoute),
                 ),
               ],
             ),

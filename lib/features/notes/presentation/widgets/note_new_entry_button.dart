@@ -6,10 +6,12 @@ class NoteNewEntryButton extends StatelessWidget {
     super.key,
     required this.onPressed,
     this.label = 'Start a new entry',
+    this.backgroundColor = AppColors.card,
   });
 
   final VoidCallback onPressed;
   final String label;
+  final Color backgroundColor;
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +23,7 @@ class NoteNewEntryButton extends StatelessWidget {
         child: FilledButton(
           onPressed: onPressed,
           style: FilledButton.styleFrom(
-            backgroundColor: AppColors.card,
+            backgroundColor: backgroundColor,
             foregroundColor: AppColors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(28),

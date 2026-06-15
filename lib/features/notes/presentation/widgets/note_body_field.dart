@@ -5,7 +5,7 @@ class NoteBodyField extends StatelessWidget {
   const NoteBodyField({
     super.key,
     required this.controller,
-    this.hintText = 'Tap here to continue',
+    this.hintText = 'Write your note here...',
     this.readOnly = false,
     this.autofocus = false,
   });
@@ -26,12 +26,14 @@ class NoteBodyField extends StatelessWidget {
       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
         color: AppColors.text,
         height: 1.6,
+        fontSize: 16,
       ),
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
           color: AppColors.gray,
           height: 1.6,
+          fontSize: 16,
         ),
         border: InputBorder.none,
         contentPadding: EdgeInsets.zero,

@@ -1,86 +1,100 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pocket_notes/core/constants/app_colors.dart';
-import 'package:pocket_notes/features/notes/data/notes_sample_data.dart';
-import 'package:pocket_notes/features/notes/presentation/widgets/note_body_field.dart';
+import 'package:pocket_notes/core/constants/app_constants.dart';
+import 'package:pocket_notes/features/notes/presentation/state/note_detail_editor_state.dart';
+import 'package:pocket_notes/features/notes/presentation/widgets/delete_dialog.dart';
+import 'package:pocket_notes/features/notes/presentation/widgets/note_detail_editor_body.dart';
 import 'package:pocket_notes/features/notes/presentation/widgets/note_editor_app_bar.dart';
-import 'package:pocket_notes/features/notes/presentation/widgets/note_editor_toolbar.dart';
-import 'package:pocket_notes/features/notes/presentation/widgets/note_title_field.dart';
+import 'package:pocket_notes/features/notes/providers/note_detail_editor_provider.dart';
 
-class NoteDetailScreen extends StatefulWidget {
-  const NoteDetailScreen({
-    super.key,
-    required this.noteId,
-  });
+class NoteDetailScreen extends ConsumerWidget {
+  const NoteDetailScreen({super.key, required this.noteId});
 
   final String noteId;
 
   @override
-  State<NoteDetailScreen> createState() => _NoteDetailScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final editorState = ref.watch(noteDetailEditorProvider(noteId));
+    final notifier = ref.read(noteDetailEditorProvider(noteId).notifier);
 
-class _NoteDetailScreenState extends State<NoteDetailScreen> {
-  late final TextEditingController _titleController;
-  late final TextEditingController _bodyController;
+    ref.listen(noteDetailEditorProvider(noteId), (previous, next) {
+      _handleEditorSideEffects(context, ref, previous, next);
+    });
 
-  @override
-  void initState() {
-    super.initState();
-    final note = NotesSampleData.findById(widget.noteId);
-    _titleController = TextEditingController(text: note?.title ?? '');
-    _bodyController = TextEditingController(text: note?.body ?? '');
-  }
-
-  @override
-  void dispose() {
-    _titleController.dispose();
-    _bodyController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final note = NotesSampleData.findById(widget.noteId);
-
-    if (note == null) {
+    if (editorState.isMissing) {
       return Scaffold(
-        backgroundColor: AppColors.noteEditorBackground,
-        appBar: const NoteEditorAppBar(),
+        backgroundColor: AppColors.white,
+        appBar: const NoteEditorAppBar(actionButtonText: null),
         body: const Center(child: Text('Note not found')),
       );
     }
 
+    final category = editorState.category!;
+
     return Scaffold(
-      backgroundColor: AppColors.noteEditorBackground,
+      backgroundColor: AppColors.white,
       appBar: NoteEditorAppBar(
-        onMenuTap: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Note options coming soon')),
-          );
-        },
+        appBarColor: category.appBarColor,
+        actionButtonTap: editorState.isSaving
+            ? null
+            : () => _showDeleteDialog(context, notifier.delete),
+        actionButtonText: 'Delete',
+        secondaryActionButtonTap: editorState.isSaving ? null : notifier.save,
+        secondaryActionButtonText: 'Save',
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    NoteTitleField(controller: _titleController),
-                    const SizedBox(height: 20),
-                    NoteBodyField(controller: _bodyController),
-                  ],
-                ),
-              ),
-            ),
-            NoteEditorToolbar(
-              onAddTap: () => context.pop(),
-            ),
-          ],
+        child: NoteDetailEditorBody(
+          state: editorState,
+          onTitleChanged: notifier.updateTitle,
+          onBodyChanged: notifier.updateBody,
+          onSave: editorState.isSaving ? null : notifier.save,
         ),
       ),
     );
+  }
+
+  void _showDeleteDialog(
+    BuildContext context,
+    Future<void> Function() onDelete,
+  ) {
+    showDialog<void>(
+      context: context,
+      builder: (context) => DeleteDialog(onConfirm: onDelete),
+    );
+  }
+
+  void _handleEditorSideEffects(
+    BuildContext context,
+    WidgetRef ref,
+    NoteDetailEditorState? previous,
+    NoteDetailEditorState next,
+  ) {
+    final notifier = ref.read(noteDetailEditorProvider(noteId).notifier);
+
+    if (next.errorMessage != null &&
+        next.errorMessage != previous?.errorMessage) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(next.errorMessage!)));
+    }
+
+    if (next.hasConflict && previous?.hasConflict != true) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!context.mounted) return;
+        context.push('${AppConstants.noteConflictRoute}/${next.noteId}');
+      });
+    }
+
+    final action = next.completedAction;
+    if (action == null || action == previous?.completedAction) return;
+
+    notifier.clearCompletedAction();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!context.mounted) return;
+      context.pop();
+    });
   }
 }

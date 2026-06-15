@@ -36,7 +36,7 @@ class HomeCategoryCard extends StatelessWidget {
         height: 140,
         clipBehavior: Clip.hardEdge,
         decoration: BoxDecoration(
-          color: AppColors.primary,
+          color: backgroundColor,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Stack(

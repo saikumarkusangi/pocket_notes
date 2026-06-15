@@ -19,16 +19,18 @@ class NoteTitleField extends StatelessWidget {
       controller: controller,
       readOnly: readOnly,
       maxLines: null,
-      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
         color: AppColors.text,
         fontWeight: FontWeight.w700,
         height: 1.3,
+        fontSize: 24,
       ),
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: Theme.of(context).textTheme.headlineSmall?.copyWith(
+        hintStyle: Theme.of(context).textTheme.headlineMedium?.copyWith(
           color: AppColors.gray,
           fontWeight: FontWeight.w700,
+          fontSize: 24,
         ),
         border: InputBorder.none,
         contentPadding: EdgeInsets.zero,

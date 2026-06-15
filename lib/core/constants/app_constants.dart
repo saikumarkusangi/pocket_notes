@@ -15,6 +15,7 @@ class AppConstants {
   static const String userSettingsStorageKey = 'user_settings_storage_key';
   static const String authTokenStorageKey = 'auth_token_storage_key';
   static const String userDataStorageKey = 'user_data_storage_key';
+  static const String notesCacheSyncedAtKey = 'notes_cache_synced_at';
   static const String themeStorageKey = 'theme';
 
   // Timeout Durations
@@ -36,13 +37,16 @@ class AppConstants {
   static const String forgotPasswordRoute = '/forgot_password';
   static const String homeRoute = '/home';
   static const String notesListRoute = '/notes';
+  static const String quickNotesListRoute = '/quick-notes';
+  static const String shoppingListRoute = '/shopping-list';
+  static const String todoListRoute = '/todo-list';
   static const String createNoteRoute = '/create_note';
   static const String noteDetailRoute = '/note_detail';
   static const String editNoteRoute = '/edit_note';
   static const String noteConflictRoute = '/note_conflict';
   static const String settingsRoute = '/settings';
 
-  // Isar Box Names
+  // Hive Box Names
   static const String notes = 'notes_box';
   static const String offlineSyncQueue = 'offline_sync_queue_box';
 }

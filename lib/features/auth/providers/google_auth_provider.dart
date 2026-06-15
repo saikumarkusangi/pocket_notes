@@ -4,6 +4,8 @@ import 'package:pocket_notes/features/auth/data/models/user_model.dart';
 import 'package:pocket_notes/features/auth/data/services/google_auth_service.dart';
 import 'package:pocket_notes/features/auth/providers/auth_provider.dart';
 import 'package:pocket_notes/features/auth/providers/user_repository_provider.dart';
+import 'package:pocket_notes/core/services/notes_sync_coordinator.dart';
+import 'package:pocket_notes/features/notes/providers/notes_offline_provider.dart';
 
 enum GoogleAuthStatus { idle, loading, success, cancelled, error }
 
@@ -60,9 +62,7 @@ class GoogleAuthNotifier extends Notifier<GoogleAuthState> {
           .read(userRepositoryProvider)
           .syncUserAfterLogin(result.user!);
 
-      await ref
-          .read(authProvider.notifier)
-          .saveSession(
+      await ref.read(authProvider.notifier).saveSession(
             token: result.user!.idToken ?? result.user!.id,
             user: UserModel(
               id: apiUser.id,
@@ -72,6 +72,19 @@ class GoogleAuthNotifier extends Notifier<GoogleAuthState> {
               googleId: result.user!.id,
             ),
           );
+
+      await ref.read(notesOfflineRepositoryProvider).repairOrphanedNotes(
+        apiUser.id,
+      );
+
+      try {
+        await ref.read(notesSyncCoordinatorProvider).run(
+          showNotification: true,
+          notifyWhenIdle: true,
+        );
+      } catch (_) {
+        // Cached notes remain available if the initial sync fails.
+      }
     } on DioException catch (error) {
       state = GoogleAuthState(
         status: GoogleAuthStatus.error,

@@ -1,0 +1,128 @@
+import 'package:flutter/material.dart';
+import 'package:pocket_notes/core/utils/note_rich_text_controller.dart';
+import 'package:pocket_notes/features/notes/data/models/note_category.dart';import 'package:pocket_notes/features/notes/presentation/state/note_detail_editor_state.dart';
+import 'package:pocket_notes/features/notes/presentation/widgets/checklist_note_editor.dart';
+import 'package:pocket_notes/features/notes/presentation/widgets/journal_note_editor.dart';
+import 'package:pocket_notes/features/notes/presentation/widgets/quick_note_editor.dart';
+
+class NoteDetailEditorBody extends StatefulWidget {
+  const NoteDetailEditorBody({
+    super.key,
+    required this.state,
+    required this.onTitleChanged,
+    required this.onBodyChanged,
+    required this.onSave,
+  });
+
+  final NoteDetailEditorState state;
+  final ValueChanged<String> onTitleChanged;
+  final ValueChanged<String> onBodyChanged;
+  final VoidCallback? onSave;
+
+  @override
+  State<NoteDetailEditorBody> createState() => _NoteDetailEditorBodyState();
+}
+
+class _NoteDetailEditorBodyState extends State<NoteDetailEditorBody> {
+  late final TextEditingController _titleController;
+  late final TextEditingController _bodyController;
+  String? _boundNoteId;
+
+  @override
+  void initState() {
+    super.initState();
+    _titleController = TextEditingController(text: widget.state.title);
+    _bodyController = _createBodyController(
+      widget.state.category,
+      widget.state.body,
+    );
+    _boundNoteId = widget.state.noteId;
+    _titleController.addListener(_onTitleChanged);
+    _bodyController.addListener(_onBodyChanged);
+  }
+
+  TextEditingController _createBodyController(
+    NoteCategory? category,
+    String body,
+  ) {
+    if (category == NoteCategory.journal) {
+      return NoteRichTextController(serialized: body);
+    }
+    return TextEditingController(text: body);
+  }
+
+  String get _bodyValue {
+    final controller = _bodyController;
+    if (controller is NoteRichTextController) {
+      return controller.serializedBody;
+    }
+    return controller.text;
+  }
+
+  void _onTitleChanged() => widget.onTitleChanged(_titleController.text);
+  void _onBodyChanged() => widget.onBodyChanged(_bodyValue);
+
+  @override
+  void didUpdateWidget(NoteDetailEditorBody oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    final noteId = widget.state.noteId;
+    if (noteId != _boundNoteId) {
+      _boundNoteId = noteId;
+      _titleController.text = widget.state.title;
+      _setBodyText(widget.state.body);
+    }
+  }
+
+  void _setBodyText(String body) {
+    final controller = _bodyController;
+    if (controller is NoteRichTextController) {
+      controller.loadSerialized(body);
+      return;
+    }
+    controller.text = body;
+  }
+
+  @override
+  void dispose() {
+    _titleController
+      ..removeListener(_onTitleChanged)
+      ..dispose();
+    _bodyController
+      ..removeListener(_onBodyChanged)
+      ..dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final category = widget.state.category;
+    if (category == null) {
+      return const SizedBox.shrink();
+    }
+
+    final actionColor = category.actionButtonColor;
+
+    return switch (category) {
+      NoteCategory.journal => JournalNoteEditor(
+        titleController: _titleController,
+        bodyController: _bodyController as NoteRichTextController,
+        onSave: widget.onSave,
+        actionButtonColor: actionColor,
+        date: widget.state.createdAt,
+        isLoading: widget.state.isSaving ,
+      ),
+      NoteCategory.quickNotes => QuickNoteEditor(
+        titleController: _titleController,
+        bodyController: _bodyController,
+        actionButtonColor: actionColor,
+      ),
+      NoteCategory.shoppingList || NoteCategory.todoList => ChecklistNoteEditor(
+        category: category,
+        titleController: _titleController,
+        bodyController: _bodyController,
+        onSave: widget.onSave,
+      ),
+    };
+  }
+}

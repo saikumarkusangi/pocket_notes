@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pocket_notes/core/constants/app_colors.dart';
 import 'package:pocket_notes/features/auth/providers/auth_provider.dart';
 import 'package:pocket_notes/features/auth/providers/google_auth_provider.dart';
+import 'package:pocket_notes/features/home/presentation/widgets/logout_dialog.dart';
 
 class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
   const HomeAppBar({super.key});
@@ -55,7 +56,14 @@ class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
         actions: [
           IconButton(
             onPressed: () {
-              ref.read(googleAuthProvider.notifier).logout();
+              showDialog(
+                context: context,
+                builder: (context) => LogoutDialog(
+                  onConfirm: () {
+                    ref.read(googleAuthProvider.notifier).logout();
+                  },
+                ),
+              );
             },
             icon: const Icon(Icons.logout, color: AppColors.border),
           ),

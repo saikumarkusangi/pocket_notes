@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pocket_notes/core/constants/app_constants.dart';
 import 'package:pocket_notes/core/providers/storage_provider.dart';
 import 'package:pocket_notes/features/auth/data/models/user_model.dart';
+import 'package:pocket_notes/features/auth/providers/user_repository_provider.dart';
 
 class AuthState {
   const AuthState({this.isAuthenticated = false, this.user});
@@ -51,5 +52,41 @@ class AuthNotifier extends Notifier<AuthState> {
     await prefs.remove(AppConstants.userDataStorageKey);
 
     state = AuthState(isAuthenticated: false, user: null);
+  }
+
+  /// Restores a missing user id from the API for sessions saved before id
+  /// was persisted locally.
+  Future<void> repairSessionIfNeeded() async {
+    final user = state.user;
+    if (!state.isAuthenticated || user == null || user.id.isNotEmpty) {
+      return;
+    }
+    if (user.email.isEmpty) return;
+
+    try {
+      final remoteUser = await ref
+          .read(userRepositoryProvider)
+          .findUserByEmail(user.email);
+      if (remoteUser == null || remoteUser.id.isEmpty) return;
+
+      final token =
+          ref.read(sharedPreferencesProvider).getString(
+            AppConstants.authTokenStorageKey,
+          ) ??
+          '';
+
+      await saveSession(
+        token: token,
+        user: UserModel(
+          id: remoteUser.id,
+          email: user.email,
+          name: user.name ?? remoteUser.name,
+          photoUrl: user.photoUrl ?? remoteUser.photoUrl,
+          googleId: user.googleId ?? remoteUser.googleId,
+        ),
+      );
+    } catch (_) {
+      // Offline or API unavailable — local notes can still load after repair.
+    }
   }
 }

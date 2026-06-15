@@ -6,7 +6,9 @@ import 'package:pocket_notes/core/router/error_screen.dart';
 import 'package:pocket_notes/features/auth/presentation/screens/login_screen.dart';
 import 'package:pocket_notes/features/auth/providers/auth_provider.dart';
 import 'package:pocket_notes/features/home/presentation/screens/home_screen.dart';
+import 'package:pocket_notes/features/notes/data/models/note_category.dart';
 import 'package:pocket_notes/features/notes/presentation/screens/create_note_screen.dart';
+import 'package:pocket_notes/features/notes/presentation/screens/note_conflict_screen.dart';
 import 'package:pocket_notes/features/notes/presentation/screens/note_detail_screen.dart';
 import 'package:pocket_notes/features/notes/presentation/screens/notes_list_screen.dart';
 import 'package:pocket_notes/features/splash/presentation/splash_screen.dart';
@@ -46,15 +48,40 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppConstants.homeRoute,
         builder: (context, state) => const HomeScreen(),
       ),
-      // Notes List Route
+      // Notes List Routes
       GoRoute(
         path: AppConstants.notesListRoute,
-        builder: (context, state) => const NotesListScreen(),
+        builder: (context, state) => const NotesListScreen(
+          category: NoteCategory.journal,
+        ),
+      ),
+      GoRoute(
+        path: AppConstants.quickNotesListRoute,
+        builder: (context, state) => const NotesListScreen(
+          category: NoteCategory.quickNotes,
+        ),
+      ),
+      GoRoute(
+        path: AppConstants.shoppingListRoute,
+        builder: (context, state) => const NotesListScreen(
+          category: NoteCategory.shoppingList,
+        ),
+      ),
+      GoRoute(
+        path: AppConstants.todoListRoute,
+        builder: (context, state) => const NotesListScreen(
+          category: NoteCategory.todoList,
+        ),
       ),
       // Create Note Route
       GoRoute(
         path: AppConstants.createNoteRoute,
-        builder: (context, state) => const CreateNoteScreen(),
+        builder: (context, state) {
+          final category = NoteCategory.fromName(
+            state.uri.queryParameters['category'],
+          );
+          return CreateNoteScreen(category: category);
+        },
       ),
       // Note Detail / Edit Route
       GoRoute(
@@ -67,6 +94,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '${AppConstants.editNoteRoute}/:id',
         builder: (context, state) => NoteDetailScreen(
           noteId: state.pathParameters['id']!,
+        ),
+      ),
+      GoRoute(
+        path: '${AppConstants.noteConflictRoute}/:id',
+        builder: (context, state) => NoteConflictScreen(
+          localId: state.pathParameters['id']!,
         ),
       ),
     ],

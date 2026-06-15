@@ -3,9 +3,17 @@ import 'package:flutter/services.dart';
 import 'package:pocket_notes/core/constants/app_colors.dart';
 
 class NotesListAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const NotesListAppBar({super.key, required this.title, this.onSortTap});
+  const NotesListAppBar({
+    super.key,
+    required this.title,
+    required this.appBarColor,
+    this.listBackgroundColor = AppColors.white,
+    this.onSortTap,
+  });
 
   final String title;
+  final Color appBarColor;
+  final Color listBackgroundColor;
   final VoidCallback? onSortTap;
 
   @override
@@ -14,32 +22,39 @@ class NotesListAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: const SystemUiOverlayStyle(
-        statusBarColor: AppColors.notesListBackground,
+      value: SystemUiOverlayStyle(
+        statusBarColor: appBarColor,
         statusBarIconBrightness: Brightness.dark,
       ),
       child: AppBar(
-        backgroundColor: AppColors.notesListBackground,
+        backgroundColor: appBarColor,
         elevation: 0,
         scrolledUnderElevation: 0,
-        leading: IconButton(
-          onPressed: () => Navigator.of(context).maybePop(),
-          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.text),
+        automaticallyImplyLeading: false,
+        title: Row(
+          children: [
+            IconButton(
+              onPressed: () => Navigator.of(context).maybePop(),
+              style: IconButton.styleFrom(backgroundColor: AppColors.white),
+              icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.text),
+            ),
+            Expanded(
+              child: Text(
+                title,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: AppColors.text,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            const SizedBox(width: 48),
+          ],
         ),
-        title: Text(
-          title,
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            color: AppColors.text,
-            fontWeight: FontWeight.w600,
-          ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(color: listBackgroundColor, height: 1),
         ),
-        centerTitle: true,
-        // actions: [
-        //   IconButton(
-        //     onPressed: onSortTap,
-        //     icon: const Icon(Icons.swap_vert, color: AppColors.text),
-        //   ),
-        // ],
       ),
     );
   }
