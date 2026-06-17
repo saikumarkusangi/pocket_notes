@@ -26,17 +26,16 @@ class NoteDetailScreen extends ConsumerWidget {
     if (editorState.isMissing) {
       return Scaffold(
         backgroundColor: AppColors.white,
-        appBar: const NoteEditorAppBar(actionButtonText: null),
+        appBar: const NoteEditorAppBar(appBarColor: Colors.white),
         body: const Center(child: Text('Note not found')),
       );
     }
 
-    final category = editorState.category!;
 
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: NoteEditorAppBar(
-        appBarColor: category.appBarColor,
+        appBarColor: Colors.white,
         actionButtonTap: editorState.isSaving
             ? null
             : () => _showDeleteDialog(context, notifier.delete),

@@ -21,9 +21,9 @@ class JournalNoteCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
+              color: Colors.black.withValues(alpha: 0.2),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
@@ -33,7 +33,7 @@ class JournalNoteCard extends StatelessWidget {
           children: [
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              color: AppColors.white,
+              color: AppColors.primary,
               child: Row(
                 children: [
                   Expanded(
@@ -47,6 +47,12 @@ class JournalNoteCard extends StatelessWidget {
                         children: [
                           TextSpan(
                             text: DateFormats.formatDate(note.createdAt),
+                            style: Theme.of(context).textTheme.titleSmall
+                                ?.copyWith(
+                                  color: Colors.grey.shade700,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 12,
+                                ),
                           ),
                           TextSpan(
                             text:
@@ -62,7 +68,7 @@ class JournalNoteCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  NoteSyncStatusBadge(status: note.syncStatus),
+                  NoteSyncStatusBadge(status: note.syncStatus, showText: false),
                 ],
               ),
             ),
@@ -74,8 +80,10 @@ class JournalNoteCard extends StatelessWidget {
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   color: AppColors.text,
                   fontWeight: FontWeight.w600,
-                  fontSize: 20,
+                  fontSize: 18,
                 ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
             Padding(

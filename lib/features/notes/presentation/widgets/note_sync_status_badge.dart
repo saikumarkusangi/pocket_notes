@@ -5,12 +5,10 @@ class NoteSyncStatusBadge extends StatelessWidget {
   const NoteSyncStatusBadge({
     super.key,
     required this.status,
-    this.opacityValue = 0.12,
     this.showText = true,
   });
 
   final NoteSyncStatus status;
-  final double opacityValue;
   final bool showText;
   @override
   Widget build(BuildContext context) {
@@ -30,9 +28,11 @@ class NoteSyncStatusBadge extends StatelessWidget {
     };
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: showText
+          ? const EdgeInsets.symmetric(horizontal: 8, vertical: 4)
+          : EdgeInsets.zero,
       decoration: BoxDecoration(
-        color: color.withValues(alpha: opacityValue),
+        color: showText ? color : Colors.transparent,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -40,18 +40,12 @@ class NoteSyncStatusBadge extends StatelessWidget {
         children: [
           Icon(
             icon,
-            size: 14,
-            color: opacityValue == 0.12 ? color : Colors.white,
+            size: showText ? 14 : 18,
+            color: !showText ? color : Colors.white,
           ),
           if (showText) const SizedBox(width: 4),
           if (showText)
-            Text(
-              status.label,
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: opacityValue == 0.12 ? color : Colors.white,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+            Text(status.label, style: Theme.of(context).textTheme.labelSmall),
         ],
       ),
     );

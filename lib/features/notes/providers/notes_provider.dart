@@ -29,6 +29,10 @@ Future<void> requestNotesSync(WidgetRef ref) async {
 
 final notesBackgroundSyncProvider = Provider<void>((ref) {
   Future<void> runSync() async {
+    final connectivity = ref.read(connectivityServiceProvider);
+    await connectivity.refreshStatus();
+    if (!await connectivity.isConnected) return;
+
     await ref.read(notesSyncCoordinatorProvider).run(
       showNotification: true,
       notifyWhenIdle: false,
@@ -36,13 +40,20 @@ final notesBackgroundSyncProvider = Provider<void>((ref) {
   }
 
   ref.listen(connectivityStatusProvider, (previous, next) {
-    if (next.value == ConnectivityStatus.online) {
+    if (next.value == ConnectivityStatus.online &&
+        previous?.value != ConnectivityStatus.online) {
       runSync();
     }
   });
 
   ref.listen(authProvider, (previous, next) {
-    if (next.isAuthenticated && next.user?.id.isNotEmpty == true) {
+    final becameAuthenticated =
+        next.isAuthenticated &&
+        next.user?.id.isNotEmpty == true &&
+        (previous == null ||
+            !previous.isAuthenticated ||
+            previous.user?.id != next.user?.id);
+    if (becameAuthenticated) {
       runSync();
     }
   });

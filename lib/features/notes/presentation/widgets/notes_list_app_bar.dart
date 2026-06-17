@@ -35,8 +35,7 @@ class NotesListAppBar extends StatelessWidget implements PreferredSizeWidget {
           children: [
             IconButton(
               onPressed: () => Navigator.of(context).maybePop(),
-              style: IconButton.styleFrom(backgroundColor: AppColors.white),
-              icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.text),
+              icon: const Icon(Icons.arrow_back_ios, color: AppColors.text),
             ),
             Expanded(
               child: Text(
@@ -53,7 +52,10 @@ class NotesListAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
-          child: Container(color: listBackgroundColor, height: 1),
+          child: Container(
+            color: AppColors.gray.withValues(alpha: 0.1),
+            height: 2,
+          ),
         ),
       ),
     );

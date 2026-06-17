@@ -53,7 +53,6 @@ class QuickNoteCard extends StatelessWidget {
               alignment: Alignment.bottomRight,
               child: NoteSyncStatusBadge(
                 status: note.syncStatus,
-                opacityValue: 0.8,
                 showText: false,
               ),
             ),

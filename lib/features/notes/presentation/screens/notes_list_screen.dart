@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pocket_notes/core/constants/app_colors.dart';
 import 'package:pocket_notes/core/constants/app_constants.dart';
 import 'package:pocket_notes/features/notes/data/models/note_category.dart';
 import 'package:pocket_notes/features/notes/providers/notes_provider.dart';
@@ -22,12 +23,8 @@ class NotesListScreen extends ConsumerWidget {
     final cacheInfo = ref.watch(notesCacheInfoProvider);
 
     return Scaffold(
-      backgroundColor: category.listBackgroundColor,
-      appBar: NotesListAppBar(
-        title: category.title,
-        appBarColor: category.appBarColor,
-        listBackgroundColor: category.listBackgroundColor,
-      ),
+      backgroundColor: Colors.white,
+      appBar: NotesListAppBar(title: category.title, appBarColor: Colors.white),
       body: Column(
         children: [
           if (isOffline || isSyncing)
@@ -43,15 +40,16 @@ class NotesListScreen extends ConsumerWidget {
           ),
         ],
       ),
-      bottomNavigationBar: NoteNewEntryButton(
-        label: category.newEntryLabel,
-        backgroundColor: category.actionButtonColor,
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.black,
         onPressed: () async {
           await context.push(
             '${AppConstants.createNoteRoute}?category=${category.name}',
           );
           bumpNotesRefresh(ref);
         },
+        child: const Icon(Icons.add),
       ),
     );
   }

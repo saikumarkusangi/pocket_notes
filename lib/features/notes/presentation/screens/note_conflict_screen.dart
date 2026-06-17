@@ -24,7 +24,7 @@ class NoteConflictScreen extends ConsumerWidget {
 
     if (conflictState.isMissing) {
       return Scaffold(
-        appBar: const NoteEditorAppBar(actionButtonText: null),
+        appBar: const NoteEditorAppBar(appBarColor: Colors.white),
         body: const Center(child: Text('No conflict found for this note.')),
       );
     }
@@ -33,17 +33,12 @@ class NoteConflictScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.white,
-      appBar: NoteEditorAppBar(
-        appBarColor: note.category.appBarColor,
-        actionButtonText: 'Resolve',
-      ),
-      body: SafeArea(
-        child: NoteConflictBody(
-          note: note,
-          isResolving: conflictState.isResolving,
-          onKeepLocal: () => notifier.resolve(keepLocal: true),
-          onKeepRemote: () => notifier.resolve(keepLocal: false),
-        ),
+      appBar: NoteEditorAppBar(appBarColor: Colors.white),
+      body: NoteConflictBody(
+        note: note,
+        isResolving: conflictState.isResolving,
+        onKeepLocal: () => notifier.resolve(keepLocal: true),
+        onKeepRemote: () => notifier.resolve(keepLocal: false),
       ),
     );
   }
@@ -56,9 +51,9 @@ class NoteConflictScreen extends ConsumerWidget {
   ) {
     if (next.errorMessage != null &&
         next.errorMessage != previous?.errorMessage) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(next.errorMessage!)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(next.errorMessage!)));
     }
 
     if (!next.isResolved || previous?.isResolved == true) return;

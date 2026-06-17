@@ -65,7 +65,10 @@ class TodoListCard extends StatelessWidget {
                             ),
                           ),
 
-                          NoteSyncStatusBadge(status: note.syncStatus),
+                          NoteSyncStatusBadge(
+                            status: note.syncStatus,
+                            showText: false,
+                          ),
                         ],
                       ),
                       const SizedBox(height: 10),

@@ -42,7 +42,10 @@ class ShoppingListCard extends StatelessWidget {
               color: Colors.orange.shade100,
               child: Row(
                 children: [
-                  Icon(Icons.shopping_cart_outlined, color: Colors.orange.shade800),
+                  Icon(
+                    Icons.shopping_cart_outlined,
+                    color: Colors.orange.shade800,
+                  ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
@@ -71,7 +74,7 @@ class ShoppingListCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  NoteSyncStatusBadge(status: note.syncStatus),
+                  NoteSyncStatusBadge(status: note.syncStatus, showText: false),
                 ],
               ),
             ),
@@ -91,9 +94,8 @@ class ShoppingListCard extends StatelessWidget {
                         alignment: Alignment.centerLeft,
                         child: Text(
                           '+ $remaining more items',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.gray,
-                          ),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: AppColors.gray),
                         ),
                       ),
                     ),
@@ -119,10 +121,7 @@ class ShoppingListCard extends StatelessWidget {
 }
 
 class _ChecklistPreviewRow extends StatelessWidget {
-  const _ChecklistPreviewRow({
-    required this.label,
-    required this.isCompleted,
-  });
+  const _ChecklistPreviewRow({required this.label, required this.isCompleted});
 
   final String label;
   final bool isCompleted;
@@ -134,9 +133,7 @@ class _ChecklistPreviewRow extends StatelessWidget {
       child: Row(
         children: [
           Icon(
-            isCompleted
-                ? Icons.check_circle
-                : Icons.radio_button_unchecked,
+            isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
             size: 20,
             color: isCompleted ? Colors.orange : AppColors.gray,
           ),

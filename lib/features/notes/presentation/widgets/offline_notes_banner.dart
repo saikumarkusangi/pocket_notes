@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pocket_notes/core/constants/app_colors.dart';
+import 'package:pocket_notes/core/utils/date_formats.dart';
 
 class OfflineNotesBanner extends StatelessWidget {
   const OfflineNotesBanner({
@@ -18,9 +19,8 @@ class OfflineNotesBanner extends StatelessWidget {
 
     if (lastSyncedAt != null) {
       final local = lastSyncedAt!.toLocal();
-      final time =
-          '${local.hour.toString().padLeft(2, '0')}:${local.minute.toString().padLeft(2, '0')}';
-      return 'Offline — showing notes saved on this device (last synced $time)';
+      final formattedTime = DateFormats.formatTime(local);
+      return 'Offline — last synced $formattedTime';
     }
 
     return 'Offline — showing notes saved on this device';
@@ -29,7 +29,7 @@ class OfflineNotesBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.gray.withValues(alpha: 0.12),
+      color: isSyncing ? AppColors.gray.withValues(alpha: 0.1) : Colors.red,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         child: Row(
@@ -38,13 +38,13 @@ class OfflineNotesBanner extends StatelessWidget {
             Icon(
               isSyncing ? Icons.sync : Icons.cloud_off_outlined,
               size: 18,
-              color: AppColors.gray,
+              color: isSyncing ? AppColors.gray : AppColors.white,
             ),
             const SizedBox(width: 10),
             Text(
               _message,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.gray,
+                color: isSyncing ? AppColors.gray : AppColors.white,
                 fontWeight: FontWeight.w500,
               ),
             ),

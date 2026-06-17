@@ -68,6 +68,13 @@ class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
             icon: const Icon(Icons.logout, color: AppColors.border),
           ),
         ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(
+            color: AppColors.gray.withValues(alpha: 0.1),
+            height: 2,
+          ),
+        ),
       ),
     );
   }

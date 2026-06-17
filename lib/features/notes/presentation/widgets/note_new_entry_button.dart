@@ -33,7 +33,7 @@ class NoteNewEntryButton extends StatelessWidget {
           child: Text(
             label,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: AppColors.white,
+              color: Colors.black,
               fontWeight: FontWeight.w500,
             ),
           ),

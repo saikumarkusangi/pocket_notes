@@ -25,7 +25,7 @@ class CreateNoteScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: NoteEditorAppBar(
-        appBarColor: category.appBarColor,
+        appBarColor: Colors.white,
         actionButtonTap: editorState.isSaving ? null : notifier.save,
         actionButtonText: 'Save',
       ),
@@ -48,9 +48,9 @@ class CreateNoteScreen extends ConsumerWidget {
   ) {
     if (next.errorMessage != null &&
         next.errorMessage != previous?.errorMessage) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(next.errorMessage!)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(next.errorMessage!)));
     }
 
     if (!next.isCompleted || previous?.isCompleted == true) return;

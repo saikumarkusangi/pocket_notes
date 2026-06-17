@@ -173,6 +173,45 @@ void main() {
       expect(stored.remoteUpdatedAt, NotesTestFixtures.remoteEditedAt);
       expect(stored.syncStatus, isNot(NoteSyncStatus.conflict));
     });
+
+    test(
+      'pulls server edits even when updatedAt was not changed in the database',
+      () async {
+        final local = NotesTestFixtures.syncedLocalNote(
+          title: 'Old local title',
+          body: 'Old local body',
+          syncStatus: NoteSyncStatus.synced,
+          localUpdatedAt: NotesTestFixtures.lastSyncedAt,
+          remoteUpdatedAt: NotesTestFixtures.lastSyncedAt,
+        );
+        await storage.saveNote(local);
+
+        fakeRemote.seedNote(
+          NotesTestFixtures.remoteNote(
+            title: 'Edited directly in DB',
+            body: 'New body from admin',
+            updatedAt: NotesTestFixtures.lastSyncedAt,
+          ),
+        );
+
+        await syncService.sync(NotesTestFixtures.userId);
+
+        final stored = storage.getNoteByLocalId(NotesTestFixtures.localId)!;
+
+        expect(stored.title, 'Edited directly in DB');
+        expect(stored.body, 'New body from admin');
+      },
+    );
+
+    test('removes local notes deleted on the server', () async {
+      await storage.saveNote(NotesTestFixtures.syncedLocalNote());
+      fakeRemote.notesByUser.clear();
+      fakeRemote.notesById.clear();
+
+      await syncService.sync(NotesTestFixtures.userId);
+
+      expect(storage.getNoteByLocalId(NotesTestFixtures.localId), isNull);
+    });
   });
 
   group('4. Manual merge — Keep my version', () {
@@ -235,15 +274,15 @@ void main() {
         ),
       );
 
-      expect(find.text('Sync conflict'), findsOneWidget);
-      expect(find.text('Your version'), findsOneWidget);
-      expect(find.text('Server version'), findsOneWidget);
+      expect(find.text('Resolve Conflict'), findsOneWidget);
+      expect(find.text('Your Version'), findsOneWidget);
+      expect(find.text('Cloud Version'), findsOneWidget);
       expect(find.text('My edited title'), findsOneWidget);
       expect(find.text('My edited body'), findsOneWidget);
       expect(find.text('Server title'), findsOneWidget);
       expect(find.text('Server body'), findsOneWidget);
-      expect(find.text('Keep my version'), findsOneWidget);
-      expect(find.text('Keep server version'), findsOneWidget);
+      expect(find.text('Use Local Version'), findsOneWidget);
+      expect(find.text('Use Cloud Version'), findsOneWidget);
     });
   });
 }

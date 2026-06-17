@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pocket_notes/core/constants/app_colors.dart';
-import 'package:pocket_notes/features/notes/presentation/widgets/delete_dialog.dart';
 
 class NoteEditorAppBar extends StatelessWidget implements PreferredSizeWidget {
   const NoteEditorAppBar({
     super.key,
     this.appBarColor = AppColors.primary,
     this.actionButtonTap,
-    required this.actionButtonText,
+    this.actionButtonText,
     this.secondaryActionButtonTap,
     this.secondaryActionButtonText,
   });
@@ -37,8 +36,8 @@ class NoteEditorAppBar extends StatelessWidget implements PreferredSizeWidget {
           alignment: Alignment.centerLeft,
           child: IconButton(
             onPressed: () => Navigator.of(context).maybePop(),
-            style: IconButton.styleFrom(backgroundColor: AppColors.white),
-            icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.text),
+            style: IconButton.styleFrom(),
+            icon: const Icon(Icons.arrow_back_ios, color: AppColors.text),
           ),
         ),
         actions: [

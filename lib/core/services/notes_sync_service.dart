@@ -6,6 +6,8 @@ import 'package:pocket_notes/features/notes/data/local/hive_notes_storage.dart';
 
 import 'package:pocket_notes/features/notes/data/local/local_note_record.dart';
 
+import 'package:pocket_notes/features/notes/data/models/note_model.dart';
+
 import 'package:pocket_notes/features/notes/data/models/note_sync_status.dart';
 
 import 'package:pocket_notes/features/notes/data/models/sync_operation_type.dart';
@@ -36,6 +38,7 @@ class NotesSyncService {
   final _uuid = const Uuid();
 
   bool _isSyncing = false;
+  bool _pullRemoteBeforePush = true;
 
   Future<void> syncIfOnline(
     String userId, {
@@ -99,11 +102,17 @@ class NotesSyncService {
     try {
       onProgress?.call(8, 'Preparing your notes…');
 
-      pushedCount = await _pushPendingChanges(userId, onProgress);
-
-      onProgress?.call(52, 'Checking the cloud for updates…');
-
-      pulledCount = await _pullRemoteChanges(userId, onProgress);
+      final pullFirst = _pullRemoteBeforePush;
+      if (pullFirst) {
+        _pullRemoteBeforePush = false;
+        pulledCount = await _pullRemoteChanges(userId, onProgress);
+        onProgress?.call(45, 'Uploading your changes…');
+        pushedCount = await _pushPendingChanges(userId, onProgress);
+      } else {
+        pushedCount = await _pushPendingChanges(userId, onProgress);
+        onProgress?.call(52, 'Checking the cloud for updates…');
+        pulledCount = await _pullRemoteChanges(userId, onProgress);
+      }
 
       onProgress?.call(100, 'Finishing up…');
 
@@ -300,7 +309,7 @@ class NotesSyncService {
 
     if (remoteNotes.isEmpty) {
       onProgress?.call(92, 'Your notes are already current');
-
+      await _reconcileRemoteDeletions(userId, remoteNotes);
       return 0;
     }
 
@@ -361,6 +370,8 @@ class NotesSyncService {
         local.remoteUpdatedAt ?? DateTime.fromMillisecondsSinceEpoch(0),
       );
 
+      final contentDiffers = _remoteDiffers(local, remote);
+
       if (local.syncStatus == NoteSyncStatus.pendingSync &&
           remoteIsNewer &&
           localIsNewer) {
@@ -369,26 +380,70 @@ class NotesSyncService {
         continue;
       }
 
-      if (local.syncStatus == NoteSyncStatus.synced && remoteIsNewer) {
-        final merged = local.copyWith(
-          title: remote.title,
+      final shouldAdoptRemote =
+          (local.syncStatus == NoteSyncStatus.synced &&
+              (remoteIsNewer || contentDiffers)) ||
+          (local.syncStatus == NoteSyncStatus.pendingSync &&
+              !localIsNewer &&
+              (remoteIsNewer || contentDiffers));
 
-          body: remote.body,
-
-          updatedAt: remote.updatedAt,
-
-          remoteUpdatedAt: remote.updatedAt,
-
-          category: remote.category,
-        );
-
-        await _storage.saveNote(merged);
-
+      if (shouldAdoptRemote) {
+        await _adoptRemoteVersion(local, remote);
         pulledCount++;
       }
     }
 
+    await _reconcileRemoteDeletions(userId, remoteNotes);
+
     return pulledCount;
+  }
+
+  bool _remoteDiffers(LocalNoteRecord local, NoteModel remote) {
+    return local.title != remote.title ||
+        local.body != remote.body ||
+        local.category != remote.category;
+  }
+
+  Future<void> _adoptRemoteVersion(
+    LocalNoteRecord local,
+    NoteModel remote,
+  ) async {
+    final merged = local.copyWith(
+      title: remote.title,
+      body: remote.body,
+      updatedAt: remote.updatedAt,
+      remoteUpdatedAt: remote.updatedAt,
+      localUpdatedAt: remote.updatedAt,
+      category: remote.category,
+      syncStatus: NoteSyncStatus.synced,
+      clearConflict: true,
+    );
+
+    await _storage.saveNote(merged);
+    await _storage.removeQueueItemsForNote(local.localId);
+  }
+
+  Future<void> _reconcileRemoteDeletions(
+    String userId,
+    List<NoteModel> remoteNotes,
+  ) async {
+    final remoteIds = remoteNotes
+        .map((note) => note.remoteId)
+        .whereType<String>()
+        .toSet();
+
+    final locals = _storage.getNotesForUser(userId).where(
+      (note) =>
+          note.remoteId != null &&
+          note.syncStatus == NoteSyncStatus.synced &&
+          !note.isDeleted,
+    );
+
+    for (final local in locals) {
+      if (!remoteIds.contains(local.remoteId)) {
+        await _storage.deleteNotePermanently(local.localId);
+      }
+    }
   }
 
   Future<void> _markConflict(
