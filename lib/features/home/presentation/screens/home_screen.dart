@@ -84,10 +84,11 @@ class HomeScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 16),
                       HomeCategoryCard(
-                        title: 'Password Manager',
+                        title: 'Passwords',
                         subtitle: passwordManagerSubtitle,
                         backgroundColor: Colors.purple.shade100,
                         imageAsset: AppImages.passwordManager,
+                        rotation: 6.98,
                         imageWidth: 140,
                         imageHeight: 140,
                         imageBottom: -20,

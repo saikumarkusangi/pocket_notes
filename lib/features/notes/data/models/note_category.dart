@@ -13,7 +13,7 @@ enum NoteCategory {
     NoteCategory.quickNotes => 'Quick Notes',
     NoteCategory.shoppingList => 'Shopping List',
     NoteCategory.todoList => 'To-Do List',
-    NoteCategory.passwordManager => 'Password Manager',
+    NoteCategory.passwordManager => 'Passwords',
   };
 
   String get routePath => switch (this) {

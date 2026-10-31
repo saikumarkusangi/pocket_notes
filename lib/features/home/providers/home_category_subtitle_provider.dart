@@ -19,6 +19,7 @@ class HomeCategorySubtitle {
     if (notes.isEmpty) {
       return switch (category) {
         NoteCategory.shoppingList => 'No items yet',
+        NoteCategory.passwordManager => 'No passwords yet',
         _ => 'No notes yet',
       };
     }

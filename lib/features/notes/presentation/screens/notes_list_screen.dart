@@ -6,8 +6,8 @@ import 'package:pocket_notes/core/constants/app_constants.dart';
 import 'package:pocket_notes/features/notes/data/models/note_category.dart';
 import 'package:pocket_notes/features/notes/providers/notes_provider.dart';
 import 'package:pocket_notes/features/notes/presentation/widgets/category_notes_list_body.dart';
-import 'package:pocket_notes/features/notes/presentation/widgets/note_new_entry_button.dart';
 import 'package:pocket_notes/features/notes/presentation/widgets/notes_list_app_bar.dart';
+import 'package:pocket_notes/features/notes/presentation/widgets/password_vault_gate.dart';
 import 'package:pocket_notes/features/notes/presentation/widgets/offline_notes_banner.dart';
 
 class NotesListScreen extends ConsumerWidget {
@@ -22,7 +22,7 @@ class NotesListScreen extends ConsumerWidget {
     final isSyncing = ref.watch(notesSyncingProvider);
     final cacheInfo = ref.watch(notesCacheInfoProvider);
 
-    return Scaffold(
+    final screen = Scaffold(
       backgroundColor: Colors.white,
       appBar: NotesListAppBar(title: category.title, appBarColor: Colors.white),
       body: Column(
@@ -52,5 +52,7 @@ class NotesListScreen extends ConsumerWidget {
         child: const Icon(Icons.add),
       ),
     );
+    if (category != NoteCategory.passwordManager) return screen;
+    return PasswordVaultGate(child: screen);
   }
 }
