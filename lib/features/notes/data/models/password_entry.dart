@@ -8,6 +8,7 @@ class PasswordEntry {
     this.email = '',
     this.backupEmail = '',
     this.password = '',
+    this.imageUrl = '',
   });
 
   static const String defaultCategory = 'Social';
@@ -22,12 +23,40 @@ class PasswordEntry {
   ];
   static const String _passwordAlphabet =
       'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#%&*?';
+  static const List<({String name, String imageUrl})> imageOptions = [
+    (
+      name: 'Instagram',
+      imageUrl: 'https://www.google.com/s2/favicons?domain=instagram.com&sz=128',
+    ),
+    (
+      name: 'GitHub',
+      imageUrl: 'https://www.google.com/s2/favicons?domain=github.com&sz=128',
+    ),
+    (
+      name: 'Google',
+      imageUrl: 'https://www.google.com/s2/favicons?domain=google.com&sz=128',
+    ),
+    (
+      name: 'Behance',
+      imageUrl: 'https://www.google.com/s2/favicons?domain=behance.net&sz=128',
+    ),
+  ];
 
   final String category;
   final String username;
   final String email;
   final String backupEmail;
   final String password;
+  final String imageUrl;
+
+  Uri? get displayImageUri {
+    final trimmed = imageUrl.trim();
+    if (trimmed.isEmpty) return null;
+    final parsed = Uri.tryParse(trimmed);
+    if (parsed == null || parsed.host.isEmpty) return null;
+    if (parsed.scheme != 'http' && parsed.scheme != 'https') return null;
+    return parsed;
+  }
 
   factory PasswordEntry.fromBody(String body) {
     final trimmed = body.trim();
@@ -41,6 +70,7 @@ class PasswordEntry {
         email: _readText(decoded['email']),
         backupEmail: _readText(decoded['backupEmail']),
         password: _readText(decoded['password']),
+        imageUrl: _readText(decoded['imageUrl']),
       );
     } on FormatException {
       return const PasswordEntry();
@@ -54,6 +84,7 @@ class PasswordEntry {
       'email': email,
       'backupEmail': backupEmail,
       'password': password,
+      'imageUrl': imageUrl,
     });
   }
 

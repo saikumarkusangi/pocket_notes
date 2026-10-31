@@ -2,21 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pocket_notes/features/notes/data/models/note_model.dart';
 import 'package:pocket_notes/features/notes/data/models/password_entry.dart';
+import 'package:pocket_notes/features/notes/presentation/widgets/password_account_image.dart';
 
 class PasswordManagerCard extends StatelessWidget {
   const PasswordManagerCard({super.key, required this.note, this.onTap});
 
   final NoteModel note;
   final VoidCallback? onTap;
-
-  static const List<Color> _avatarColors = [
-    Color(0xFF1769FF),
-    Color(0xFFE1306C),
-    Color(0xFF7B61FF),
-    Color(0xFF111111),
-    Color(0xFF0A66C2),
-    Color(0xFF16A34A),
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +27,7 @@ class PasswordManagerCard extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           child: Row(
             children: [
-              _PasswordAvatar(title: title),
+              PasswordAccountImage(title: title, imageUrl: entry.imageUrl),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -68,37 +60,6 @@ class PasswordManagerCard extends StatelessWidget {
               _CopyPasswordButton(password: entry.password),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _PasswordAvatar extends StatelessWidget {
-  const _PasswordAvatar({required this.title});
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    final letter = title.characters.first.toUpperCase();
-    final colorIndex =
-        title.hashCode.abs() % PasswordManagerCard._avatarColors.length;
-    final color = PasswordManagerCard._avatarColors[colorIndex];
-    return Container(
-      width: 44,
-      height: 44,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text(
-        letter,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 18,
-          fontWeight: FontWeight.w700,
         ),
       ),
     );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pocket_notes/features/notes/data/models/password_entry.dart';
+import 'package:pocket_notes/features/notes/presentation/widgets/password_account_image.dart';
 
 class PasswordManagerEditor extends StatefulWidget {
   const PasswordManagerEditor({
@@ -24,6 +25,7 @@ class PasswordManagerEditor extends StatefulWidget {
 
 class _PasswordManagerEditorState extends State<PasswordManagerEditor> {
   static const Color _generateColor = Color(0xFF22C55E);
+  late final TextEditingController _imageUrlController;
   late final TextEditingController _usernameController;
   late final TextEditingController _emailController;
   late final TextEditingController _backupEmailController;
@@ -39,12 +41,14 @@ class _PasswordManagerEditorState extends State<PasswordManagerEditor> {
     super.initState();
     final entry = PasswordEntry.fromBody(widget.bodyController.text);
     _category = entry.category;
+    _imageUrlController = TextEditingController(text: entry.imageUrl);
     _usernameController = TextEditingController(text: entry.username);
     _emailController = TextEditingController(text: entry.email);
     _backupEmailController = TextEditingController(text: entry.backupEmail);
     _passwordController = TextEditingController(text: entry.password);
     _accountFocusNode = FocusNode();
     _lastSyncedBody = widget.bodyController.text;
+    _imageUrlController.addListener(_syncBody);
     _usernameController.addListener(_syncBody);
     _emailController.addListener(_syncBody);
     _backupEmailController.addListener(_syncBody);
@@ -66,6 +70,9 @@ class _PasswordManagerEditorState extends State<PasswordManagerEditor> {
 
   @override
   void dispose() {
+    _imageUrlController
+      ..removeListener(_syncBody)
+      ..dispose();
     _usernameController
       ..removeListener(_syncBody)
       ..dispose();
@@ -85,6 +92,7 @@ class _PasswordManagerEditorState extends State<PasswordManagerEditor> {
   void _applyEntry(PasswordEntry entry) {
     _isApplying = true;
     _category = entry.category;
+    _imageUrlController.text = entry.imageUrl;
     _usernameController.text = entry.username;
     _emailController.text = entry.email;
     _backupEmailController.text = entry.backupEmail;
@@ -101,10 +109,15 @@ class _PasswordManagerEditorState extends State<PasswordManagerEditor> {
       email: _emailController.text,
       backupEmail: _backupEmailController.text,
       password: _passwordController.text,
+      imageUrl: _imageUrlController.text.trim(),
     ).toBody();
     if (widget.bodyController.text == encoded) return;
     _lastSyncedBody = encoded;
     widget.bodyController.text = encoded;
+  }
+
+  void _selectImageUrl(String imageUrl) {
+    _imageUrlController.text = imageUrl;
   }
 
   void _changeCategory(String? value) {
@@ -150,6 +163,13 @@ class _PasswordManagerEditorState extends State<PasswordManagerEditor> {
                 focusColor: widget.actionButtonColor,
               ),
             ),
+          ),
+          const SizedBox(height: 18),
+          _PasswordImageUrlField(
+            titleController: widget.titleController,
+            imageUrlController: _imageUrlController,
+            actionButtonColor: widget.actionButtonColor,
+            onSelectImageUrl: _selectImageUrl,
           ),
           const SizedBox(height: 18),
           _PasswordLabeledField(
@@ -317,6 +337,77 @@ InputDecoration _passwordFieldDecoration({
       borderSide: BorderSide(color: focusColor),
     ),
   );
+}
+
+class _PasswordImageUrlField extends StatelessWidget {
+  const _PasswordImageUrlField({
+    required this.titleController,
+    required this.imageUrlController,
+    required this.actionButtonColor,
+    required this.onSelectImageUrl,
+  });
+
+  final TextEditingController titleController;
+  final TextEditingController imageUrlController;
+  final Color actionButtonColor;
+  final ValueChanged<String> onSelectImageUrl;
+
+  @override
+  Widget build(BuildContext context) {
+    return _PasswordLabeledField(
+      label: 'Image URL',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              ListenableBuilder(
+                listenable: Listenable.merge([
+                  titleController,
+                  imageUrlController,
+                ]),
+                builder: (context, _) {
+                  return PasswordAccountImage(
+                    title: titleController.text,
+                    imageUrl: imageUrlController.text,
+                  );
+                },
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: TextField(
+                  controller: imageUrlController,
+                  keyboardType: TextInputType.url,
+                  textInputAction: TextInputAction.next,
+                  style: _fieldTextStyle,
+                  cursorColor: actionButtonColor,
+                  decoration: _passwordFieldDecoration(
+                    hintText: 'https:// (optional)',
+                    focusColor: actionButtonColor,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final option in PasswordEntry.imageOptions)
+                ActionChip(
+                  label: Text(option.name),
+                  onPressed: () => onSelectImageUrl(option.imageUrl),
+                  visualDensity: VisualDensity.compact,
+                  backgroundColor: const Color(0xFFF4F5F7),
+                  side: BorderSide.none,
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _PasswordLabeledField extends StatelessWidget {
