@@ -97,5 +97,14 @@
     "bodyFile": "notes/21.txt",
     "createdAt": 1793477700,
     "updatedAt": 1793477700
+  },
+  {
+    "id": "22",
+    "userId": "1",
+    "title": "EPFO",
+    "type": "passwordManager",
+    "bodyFile": "notes/22.txt",
+    "createdAt": 1793477806,
+    "updatedAt": 1793477806
   }
 ]
