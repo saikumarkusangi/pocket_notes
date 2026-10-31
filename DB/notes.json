@@ -106,5 +106,14 @@
     "bodyFile": "notes/22.txt",
     "createdAt": 1793477806,
     "updatedAt": 1793477806
+  },
+  {
+    "id": "23",
+    "userId": "1",
+    "title": "Untitled",
+    "type": "quickNotes",
+    "bodyFile": "notes/23.txt",
+    "createdAt": 1793477878,
+    "updatedAt": 1793477878
   }
 ]
