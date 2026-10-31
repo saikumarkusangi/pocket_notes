@@ -73,6 +73,12 @@ final routerProvider = Provider<GoRouter>((ref) {
           category: NoteCategory.todoList,
         ),
       ),
+      GoRoute(
+        path: AppConstants.passwordManagerRoute,
+        builder: (context, state) => const NotesListScreen(
+          category: NoteCategory.passwordManager,
+        ),
+      ),
       // Create Note Route
       GoRoute(
         path: AppConstants.createNoteRoute,

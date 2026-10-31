@@ -4,6 +4,7 @@ import 'package:pocket_notes/features/notes/data/models/note_category.dart';
 import 'package:pocket_notes/features/notes/presentation/state/note_detail_editor_state.dart';
 import 'package:pocket_notes/features/notes/presentation/widgets/checklist_note_editor.dart';
 import 'package:pocket_notes/features/notes/presentation/widgets/journal_note_editor.dart';
+import 'package:pocket_notes/features/notes/presentation/widgets/password_manager_editor.dart';
 import 'package:pocket_notes/features/notes/presentation/widgets/quick_note_editor.dart';
 
 class NoteDetailEditorBody extends StatefulWidget {

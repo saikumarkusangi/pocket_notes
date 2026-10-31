@@ -4,6 +4,7 @@ import 'package:pocket_notes/core/constants/app_constants.dart';
 import 'package:pocket_notes/features/notes/data/models/note_category.dart';
 import 'package:pocket_notes/features/notes/data/models/note_model.dart';
 import 'package:pocket_notes/features/notes/presentation/widgets/journal_note_card.dart';
+import 'package:pocket_notes/features/notes/presentation/widgets/password_manager_card.dart';
 import 'package:pocket_notes/features/notes/presentation/widgets/quick_note_card.dart';
 import 'package:pocket_notes/features/notes/presentation/widgets/shopping_list_card.dart';
 import 'package:pocket_notes/features/notes/presentation/widgets/todo_list_card.dart';
