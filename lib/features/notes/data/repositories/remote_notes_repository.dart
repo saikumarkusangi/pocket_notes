@@ -20,18 +20,49 @@ class RemoteNotesRepository {
 
   Future<List<NoteModel>> getNotesByUserId(String userId) {
     return _store.run((session) async {
-      final notes = await _notesWithBodies(session);
-      final matched = notes.where((note) => note.userId == userId).toList();
-      matched.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
-      return matched;
+      final records = await _recordsForUser(session, userId);
+      final notes = await Future.wait(
+        records.map((record) => _noteFromRecord(session, record)),
+      );
+      notes.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+      return notes;
+    });
+  }
+
+  Future<List<NoteModel>> listNoteHeaders(String userId) {
+    return _store.run((session) async {
+      final records = await _recordsForUser(session, userId);
+      final headers = [
+        for (final record in records)
+          NoteModel.fromJson({...record, 'body': ''}),
+      ];
+      headers.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+      return headers;
+    });
+  }
+
+  Future<List<NoteModel>> loadNoteBodies(List<NoteModel> headers) {
+    if (headers.isEmpty) return Future.value(const []);
+    return _store.run((session) async {
+      final records = await session.readJsonList(_notesPath);
+      final byId = <String, Map<String, dynamic>>{
+        for (final record in records)
+          if (record['id'] != null) record['id'].toString(): record,
+      };
+      return Future.wait([
+        for (final header in headers)
+          _loadHeader(session, header, byId[header.remoteId]),
+      ]);
     });
   }
 
   Future<NoteModel?> getNoteById(String id) {
     return _store.run((session) async {
-      final notes = await _notesWithBodies(session);
-      for (final note in notes) {
-        if (note.remoteId == id || note.localId == id) return note;
+      final records = await session.readJsonList(_notesPath);
+      for (final record in records) {
+        if (record['id']?.toString() == id) {
+          return _noteFromRecord(session, record);
+        }
       }
       return null;
     });
@@ -133,17 +164,35 @@ class RemoteNotesRepository {
     });
   }
 
-  Future<List<NoteModel>> _notesWithBodies(GithubSession session) async {
+  Future<List<Map<String, dynamic>>> _recordsForUser(
+    GithubSession session,
+    String userId,
+  ) async {
     final records = await session.readJsonList(_notesPath);
-    final notes = <NoteModel>[];
-    for (final record in records) {
-      final bodyFile = record['bodyFile'] as String?;
-      final body = bodyFile == null
-          ? record['body'] as String? ?? ''
-          : await session.readText(githubDatabasePath(bodyFile));
-      notes.add(NoteModel.fromJson({...record, 'body': body}));
-    }
-    return notes;
+    return [
+      for (final record in records)
+        if (record['userId']?.toString() == userId) record,
+    ];
+  }
+
+  Future<NoteModel> _loadHeader(
+    GithubSession session,
+    NoteModel header,
+    Map<String, dynamic>? record,
+  ) {
+    if (record == null) return Future.value(header);
+    return _noteFromRecord(session, record);
+  }
+
+  Future<NoteModel> _noteFromRecord(
+    GithubSession session,
+    Map<String, dynamic> record,
+  ) async {
+    final bodyFile = record['bodyFile'] as String?;
+    final body = bodyFile == null
+        ? record['body'] as String? ?? ''
+        : await session.readText(githubDatabasePath(bodyFile));
+    return NoteModel.fromJson({...record, 'body': body});
   }
 
   int _unixNow() => DateTime.now().millisecondsSinceEpoch ~/ 1000;

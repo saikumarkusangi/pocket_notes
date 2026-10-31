@@ -8,7 +8,7 @@ class SplashState {
   final String? redirectRoute;
 }
 
-const Duration _splashDuration = Duration(seconds: 2);
+const Duration _splashDuration = Duration(milliseconds: 400);
 
 final splashProvider = NotifierProvider<SplashNotifier, SplashState>(
   SplashNotifier.new,

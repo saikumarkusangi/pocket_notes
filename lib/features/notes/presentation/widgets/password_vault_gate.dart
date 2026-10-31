@@ -22,11 +22,6 @@ class _PasswordVaultGateState extends ConsumerState<PasswordVaultGate> {
   @override
   Widget build(BuildContext context) {
     final vault = ref.watch(passwordVaultProvider);
-    ref.listen(passwordVaultProvider, (previous, next) {
-      if (previous == null || next.resumeTick == previous.resumeTick) return;
-      if (next.isUnlocked || next.isChecking) return;
-      _prompt();
-    });
     return Stack(
       children: [
         IgnorePointer(

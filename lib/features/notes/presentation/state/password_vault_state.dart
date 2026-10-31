@@ -5,13 +5,11 @@ class PasswordVaultState {
     this.isUnlocked = false,
     this.isChecking = false,
     this.status = BiometricUnlockResult.idle,
-    this.resumeTick = 0,
   });
 
   final bool isUnlocked;
   final bool isChecking;
   final BiometricUnlockResult status;
-  final int resumeTick;
 
   String get message {
     return switch (status) {
@@ -29,13 +27,11 @@ class PasswordVaultState {
     bool? isUnlocked,
     bool? isChecking,
     BiometricUnlockResult? status,
-    int? resumeTick,
   }) {
     return PasswordVaultState(
       isUnlocked: isUnlocked ?? this.isUnlocked,
       isChecking: isChecking ?? this.isChecking,
       status: status ?? this.status,
-      resumeTick: resumeTick ?? this.resumeTick,
     );
   }
 }

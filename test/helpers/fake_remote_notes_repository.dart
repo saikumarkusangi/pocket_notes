@@ -78,6 +78,18 @@ class TestableRemoteNotesRepository extends RemoteNotesRepository {
       fake.getNotesByUserId(userId);
 
   @override
+  Future<List<NoteModel>> listNoteHeaders(String userId) =>
+      fake.getNotesByUserId(userId);
+
+  @override
+  Future<List<NoteModel>> loadNoteBodies(List<NoteModel> headers) async {
+    return [
+      for (final header in headers)
+        fake.notesById[header.remoteId] ?? header,
+    ];
+  }
+
+  @override
   Future<NoteModel?> getNoteById(String id) => fake.getNoteById(id);
 
   @override

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pocket_notes/core/services/notes_sync_coordinator.dart';
 import 'package:pocket_notes/features/notes/presentation/state/note_detail_editor_state.dart';
@@ -72,11 +74,7 @@ class NoteDetailEditorNotifier extends Notifier<NoteDetailEditorState> {
       );
 
       ref.read(notesRefreshProvider.notifier).bump();
-      await ref.read(notesSyncCoordinatorProvider).run(
-        showNotification: true,
-        notifyWhenIdle: true,
-      );
-
+      final sync = ref.read(notesSyncCoordinatorProvider);
       _emit(
         state.copyWith(
           isSaving: false,
@@ -84,6 +82,7 @@ class NoteDetailEditorNotifier extends Notifier<NoteDetailEditorState> {
           completedAction: NoteDetailAction.saved,
         ),
       );
+      unawaited(sync.run(showNotification: false));
     } catch (error) {
       _emit(
         state.copyWith(
@@ -103,17 +102,14 @@ class NoteDetailEditorNotifier extends Notifier<NoteDetailEditorState> {
     try {
       await ref.read(notesOfflineRepositoryProvider).deleteNote(note.localId);
       ref.read(notesRefreshProvider.notifier).bump();
-      await ref.read(notesSyncCoordinatorProvider).run(
-        showNotification: true,
-        notifyWhenIdle: true,
-      );
-
+      final sync = ref.read(notesSyncCoordinatorProvider);
       _emit(
         state.copyWith(
           isSaving: false,
           completedAction: NoteDetailAction.deleted,
         ),
       );
+      unawaited(sync.run(showNotification: false));
     } catch (error) {
       _emit(
         state.copyWith(

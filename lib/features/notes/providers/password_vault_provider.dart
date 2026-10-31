@@ -1,4 +1,3 @@
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pocket_notes/core/providers/biometric_auth_provider.dart';
 import 'package:pocket_notes/core/services/biometric_unlock_result.dart';
@@ -13,12 +12,7 @@ class PasswordVaultNotifier extends Notifier<PasswordVaultState> {
   bool _isPrompting = false;
 
   @override
-  PasswordVaultState build() {
-    final observer = _PasswordVaultLifecycleObserver(onPause: lock);
-    WidgetsBinding.instance.addObserver(observer);
-    ref.onDispose(() => WidgetsBinding.instance.removeObserver(observer));
-    return const PasswordVaultState();
-  }
+  PasswordVaultState build() => const PasswordVaultState();
 
   Future<BiometricUnlockResult> unlock() async {
     if (state.isUnlocked) return BiometricUnlockResult.success;
@@ -26,9 +20,7 @@ class PasswordVaultNotifier extends Notifier<PasswordVaultState> {
     _isPrompting = true;
     state = state.copyWith(isChecking: true);
     try {
-      final result = await ref
-          .read(biometricAuthServiceProvider)
-          .unlockApp();
+      final result = await ref.read(biometricAuthServiceProvider).unlockApp();
       state = state.copyWith(
         isUnlocked: result == BiometricUnlockResult.success,
         isChecking: false,
@@ -44,27 +36,6 @@ class PasswordVaultNotifier extends Notifier<PasswordVaultState> {
       return BiometricUnlockResult.failed;
     } finally {
       _isPrompting = false;
-    }
-  }
-
-  void lock() {
-    if (_isPrompting || !state.isUnlocked) return;
-    state = state.copyWith(
-      isUnlocked: false,
-      resumeTick: state.resumeTick + 1,
-    );
-  }
-}
-
-class _PasswordVaultLifecycleObserver extends WidgetsBindingObserver {
-  _PasswordVaultLifecycleObserver({required this.onPause});
-
-  final VoidCallback onPause;
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden) {
-      onPause();
     }
   }
 }

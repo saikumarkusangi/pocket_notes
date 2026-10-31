@@ -18,6 +18,7 @@ class GithubContentsClient {
 
   final Dio _dio;
   final GithubConfig _config;
+  final Map<String, GithubFile> _cache = {};
   Future<void> _queue = Future<void>.value();
 
   Future<T> synchronized<T>(Future<T> Function() action) {
@@ -27,6 +28,62 @@ class GithubContentsClient {
   }
 
   Future<GithubFile?> readFile(String path) async {
+    final file = await _readRemote(path);
+    if (file == null) {
+      _cache.remove(path);
+      return null;
+    }
+    _cache[path] = file;
+    return file;
+  }
+
+  Future<void> writeFile({
+    required String path,
+    required String content,
+    required String message,
+  }) async {
+    for (var attempt = 0; attempt < 2; attempt++) {
+      if (attempt > 0) _cache.remove(path);
+      final existing = _cache[path] ?? await _readRemote(path);
+      try {
+        final sha = await _putFile(
+          path: path,
+          content: content,
+          message: message,
+          sha: existing?.sha,
+        );
+        if (sha == null) {
+          _cache.remove(path);
+        } else {
+          _cache[path] = GithubFile(path: path, text: content, sha: sha);
+        }
+        return;
+      } on DioException catch (error) {
+        final canRetry = error.response?.statusCode == 409 && attempt == 0;
+        if (!canRetry) rethrow;
+        _cache.remove(path);
+      }
+    }
+  }
+
+  Future<void> deleteFile({
+    required String path,
+    required String message,
+  }) async {
+    final existing = _cache[path] ?? await _readRemote(path);
+    if (existing == null) return;
+    await _dio.delete<void>(
+      _contentsPath(path),
+      data: {
+        'message': message,
+        'sha': existing.sha,
+        'branch': _config.branch,
+      },
+    );
+    _cache.remove(path);
+  }
+
+  Future<GithubFile?> _readRemote(String path) async {
     try {
       final response = await _dio.get<Map<String, dynamic>>(
         _contentsPath(path),
@@ -39,51 +96,13 @@ class GithubContentsClient {
     }
   }
 
-  Future<void> writeFile({
-    required String path,
-    required String content,
-    required String message,
-  }) async {
-    for (var attempt = 0; attempt < 2; attempt++) {
-      final existing = await readFile(path);
-      try {
-        await _putFile(
-          path: path,
-          content: content,
-          message: message,
-          sha: existing?.sha,
-        );
-        return;
-      } on DioException catch (error) {
-        final canRetry = error.response?.statusCode == 409 && attempt == 0;
-        if (!canRetry) rethrow;
-      }
-    }
-  }
-
-  Future<void> deleteFile({
-    required String path,
-    required String message,
-  }) async {
-    final existing = await readFile(path);
-    if (existing == null) return;
-    await _dio.delete<void>(
-      _contentsPath(path),
-      data: {
-        'message': message,
-        'sha': existing.sha,
-        'branch': _config.branch,
-      },
-    );
-  }
-
-  Future<void> _putFile({
+  Future<String?> _putFile({
     required String path,
     required String content,
     required String message,
     required String? sha,
   }) async {
-    await _dio.put<Map<String, dynamic>>(
+    final response = await _dio.put<Map<String, dynamic>>(
       _contentsPath(path),
       data: {
         'message': message,
@@ -92,6 +111,11 @@ class GithubContentsClient {
         if (sha != null) 'sha': sha,
       },
     );
+    final contentJson = response.data?['content'];
+    if (contentJson is! Map) return null;
+    final nextSha = contentJson['sha'] as String?;
+    if (nextSha == null || nextSha.isEmpty) return null;
+    return nextSha;
   }
 
   GithubFile? _fileFromResponse(String path, Map<String, dynamic>? data) {

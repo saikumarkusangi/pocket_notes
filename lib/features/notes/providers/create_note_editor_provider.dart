@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pocket_notes/core/services/notes_sync_coordinator.dart';
 import 'package:pocket_notes/features/auth/providers/auth_provider.dart';
@@ -66,12 +68,9 @@ class CreateNoteEditorNotifier extends Notifier<CreateNoteEditorState> {
       );
 
       ref.read(notesRefreshProvider.notifier).bump();
-      await ref.read(notesSyncCoordinatorProvider).run(
-        showNotification: true,
-        notifyWhenIdle: true,
-      );
-
+      final sync = ref.read(notesSyncCoordinatorProvider);
       state = state.copyWith(isSaving: false, isCompleted: true);
+      unawaited(sync.run(showNotification: false));
     } catch (error) {
       state = state.copyWith(
         isSaving: false,

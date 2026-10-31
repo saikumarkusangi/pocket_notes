@@ -38,6 +38,7 @@ class NotesSyncService {
   final _uuid = const Uuid();
 
   bool _isSyncing = false;
+  bool _runAgain = false;
   bool _pullRemoteBeforePush = true;
 
   Future<void> syncIfOnline(
@@ -70,6 +71,7 @@ class NotesSyncService {
     }
 
     if (_isSyncing) {
+      _runAgain = true;
       return NotesSyncResult(
         pushedCount: 0,
 
@@ -77,7 +79,7 @@ class NotesSyncService {
 
         pendingCount: _storage.getQueueForUser(userId).length,
 
-        success: false,
+        success: true,
       );
     }
 
@@ -100,31 +102,30 @@ class NotesSyncService {
     var pulledCount = 0;
 
     try {
-      onProgress?.call(8, 'Preparing your notes…');
-
-      final pullFirst = _pullRemoteBeforePush;
-      if (pullFirst) {
-        _pullRemoteBeforePush = false;
-        pulledCount = await _pullRemoteChanges(userId, onProgress);
-        onProgress?.call(45, 'Uploading your changes…');
-        pushedCount = await _pushPendingChanges(userId, onProgress);
-      } else {
-        pushedCount = await _pushPendingChanges(userId, onProgress);
-        onProgress?.call(52, 'Checking the cloud for updates…');
-        pulledCount = await _pullRemoteChanges(userId, onProgress);
-      }
-
-      onProgress?.call(100, 'Finishing up…');
-
-      return NotesSyncResult(
-        pushedCount: pushedCount,
-
-        pulledCount: pulledCount,
-
-        pendingCount: _storage.getQueueForUser(userId).length,
-
-        success: true,
-      );
+      NotesSyncResult? result;
+      do {
+        _runAgain = false;
+        onProgress?.call(8, 'Preparing your notes…');
+        final pullFirst = _pullRemoteBeforePush;
+        if (pullFirst) {
+          _pullRemoteBeforePush = false;
+          pulledCount = await _pullRemoteChanges(userId, onProgress);
+          onProgress?.call(45, 'Uploading your changes…');
+          pushedCount = await _pushPendingChanges(userId, onProgress);
+        } else {
+          pushedCount = await _pushPendingChanges(userId, onProgress);
+          onProgress?.call(52, 'Checking the cloud for updates…');
+          pulledCount = await _pullRemoteChanges(userId, onProgress);
+        }
+        onProgress?.call(100, 'Finishing up…');
+        result = NotesSyncResult(
+          pushedCount: pushedCount,
+          pulledCount: pulledCount,
+          pendingCount: _storage.getQueueForUser(userId).length,
+          success: true,
+        );
+      } while (_runAgain);
+      return result;
     } catch (_) {
       return NotesSyncResult(
         pushedCount: pushedCount,
@@ -305,13 +306,21 @@ class NotesSyncService {
 
     SyncProgressCallback? onProgress,
   ) async {
-    final remoteNotes = await _remoteRepository.getNotesByUserId(userId);
+    final headers = await _remoteRepository.listNoteHeaders(userId);
 
-    if (remoteNotes.isEmpty) {
+    if (headers.isEmpty) {
       onProgress?.call(92, 'Your notes are already current');
-      await _reconcileRemoteDeletions(userId, remoteNotes);
+      await _reconcileRemoteDeletions(userId, headers);
       return 0;
     }
+
+    final changedHeaders = [
+      for (final header in headers)
+        if (_needsRemoteBody(header)) header,
+    ];
+    final remoteNotes = changedHeaders.isEmpty
+        ? const <NoteModel>[]
+        : await _remoteRepository.loadNoteBodies(changedHeaders);
 
     var pulledCount = 0;
 
@@ -393,9 +402,16 @@ class NotesSyncService {
       }
     }
 
-    await _reconcileRemoteDeletions(userId, remoteNotes);
+    await _reconcileRemoteDeletions(userId, headers);
 
     return pulledCount;
+  }
+
+  bool _needsRemoteBody(NoteModel header) {
+    final remoteId = header.remoteId;
+    if (remoteId == null) return false;
+    final local = _storage.getNoteByRemoteId(remoteId);
+    return local?.syncStatus != NoteSyncStatus.conflict;
   }
 
   bool _remoteDiffers(LocalNoteRecord local, NoteModel remote) {
