@@ -4,7 +4,7 @@ import 'package:pocket_notes/core/constants/app_constants.dart';
 import 'package:pocket_notes/features/notes/data/models/note_category.dart';
 import 'package:pocket_notes/features/notes/data/models/note_model.dart';
 import 'package:pocket_notes/features/notes/presentation/widgets/journal_note_card.dart';
-import 'package:pocket_notes/features/notes/presentation/widgets/password_manager_card.dart';
+import 'package:pocket_notes/features/notes/presentation/widgets/password_notes_list.dart';
 import 'package:pocket_notes/features/notes/presentation/widgets/quick_note_card.dart';
 import 'package:pocket_notes/features/notes/presentation/widgets/shopping_list_card.dart';
 import 'package:pocket_notes/features/notes/presentation/widgets/todo_list_card.dart';
@@ -95,15 +95,9 @@ class CategoryNotesListBody extends StatelessWidget {
           onTap: () => _openNote(context, notes[index]),
         ),
       ),
-      NoteCategory.passwordManager => ListView.separated(
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-        itemCount: notes.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 16),
-        itemBuilder: (context, index) => PasswordManagerCard(
-          note: notes[index],
-          onTap: () => _openNote(context, notes[index]),
-        ),
+      NoteCategory.passwordManager => PasswordNotesList(
+        notes: notes,
+        onOpenNote: (note) => _openNote(context, note),
       ),
     };
   }

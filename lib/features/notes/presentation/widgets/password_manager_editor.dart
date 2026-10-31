@@ -175,6 +175,11 @@ class _PasswordManagerEditorState extends State<PasswordManagerEditor> {
           _PasswordLabeledField(
             label: 'Category',
             child: DropdownButtonFormField<String>(
+              dropdownColor: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+              decoration: _passwordFieldDecoration(
+                focusColor: widget.actionButtonColor,
+              ),
               initialValue: _category,
               items: [
                 for (final category in _categoryOptions())
@@ -189,9 +194,6 @@ class _PasswordManagerEditorState extends State<PasswordManagerEditor> {
                 color: Color(0xFF9AA0A6),
               ),
               style: _fieldTextStyle,
-              decoration: _passwordFieldDecoration(
-                focusColor: widget.actionButtonColor,
-              ),
             ),
           ),
           const SizedBox(height: 18),
