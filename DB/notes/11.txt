@@ -1,0 +1,459 @@
+**1. Arrays & Hashing**
+
+When to Use
+
+- Lookup in O(1)
+- Frequency counting
+- Duplicate detection
+
+Patterns
+
+- Frequency Map
+- Prefix Sum
+- Bucket Sort
+- Coordinate Compression
+
+Problems
+
+1. Two Sum
+2. Contains Duplicate
+3. Top K Frequent Elements
+4. Product of Array Except Self
+5. Subarray Sum Equals K
+
+---
+
+**2. Two Pointers**
+
+When to Use
+
+- Sorted arrays
+- Pair/Triplet problems
+- Palindromes
+
+Patterns
+
+- Opposite Ends
+- Fast & Slow Pointers
+
+Problems
+
+1. Two Sum II
+2. 3Sum
+3. Container With Most Water
+4. Valid Palindrome
+5. Remove Duplicates from Sorted Array
+
+---
+
+**3. Sliding Window**
+
+When to Use
+
+- Contiguous subarray/substring
+- Longest/shortest window
+
+Patterns
+
+- Fixed Window
+- Variable Window
+
+Problems
+
+1. Maximum Average Subarray
+2. Longest Substring Without Repeating Characters
+3. Minimum Window Substring
+4. Permutation in String
+
+---
+
+4. Binary Search
+
+When to Use
+
+- Sorted data
+- Search space optimization
+
+Patterns
+
+- Search in Sorted Array
+- Binary Search on Answer
+
+Problems
+
+1. Binary Search
+2. Search in Rotated Sorted Array
+3. Koko Eating Bananas
+4. Capacity To Ship Packages
+
+---
+
+5. Linked List
+
+Patterns
+
+- Fast & Slow
+- Reverse List
+- Merge Lists
+- Cycle Detection
+
+Problems
+
+1. Reverse Linked List
+2. Linked List Cycle
+3. Merge Two Sorted Lists
+4. Reorder List
+5. LRU Cache
+
+---
+
+6. Stack
+
+Patterns
+
+- Monotonic Stack
+- Expression Evaluation
+
+Problems
+
+1. Valid Parentheses
+2. Daily Temperatures
+3. Next Greater Element
+4. Largest Rectangle in Histogram
+5. Min Stack
+
+---
+
+7. Queue & Deque
+
+Patterns
+
+- BFS
+- Monotonic Queue
+
+Problems
+
+1. Sliding Window Maximum
+2. Number of Recent Calls
+3. Rotting Oranges
+
+---
+
+8. Heap / Priority Queue
+
+When to Use
+
+- K Largest / Smallest
+- Streaming Data
+
+Patterns
+
+- Min Heap
+- Max Heap
+- Two Heaps
+
+Problems
+
+1. Kth Largest Element
+2. Merge K Sorted Lists
+3. Top K Frequent Elements
+4. Find Median from Data Stream
+
+---
+
+9. Intervals
+
+Patterns
+
+- Sort + Merge
+- Sweep Line
+
+Problems
+
+1. Merge Intervals
+2. Insert Interval
+3. Meeting Rooms
+4. Non-overlapping Intervals
+
+---
+
+10. Greedy
+
+When to Use
+
+- Local optimum leads to global optimum
+
+Problems
+
+1. Jump Game
+2. Gas Station
+3. Partition Labels
+4. Task Scheduler
+
+---
+
+11. Trees
+
+Patterns
+
+- DFS
+- BFS
+- Recursive Traversal
+
+Problems
+
+1. Maximum Depth of Binary Tree
+2. Diameter of Binary Tree
+3. Balanced Binary Tree
+4. Path Sum
+
+---
+
+12. Binary Search Tree (BST)
+
+Patterns
+
+- Inorder Traversal
+- BST Property
+
+Problems
+
+1. Validate BST
+2. Lowest Common Ancestor
+3. Kth Smallest Element in BST
+
+---
+
+13. Backtracking
+
+When to Use
+
+- Generate all possibilities
+
+Pattern
+
+- Choose → Explore → Undo
+
+Problems
+
+1. Subsets
+2. Permutations
+3. Combination Sum
+4. N Queens
+5. Sudoku Solver
+
+---
+
+14. Graphs
+
+Patterns
+
+- DFS
+- BFS
+- Connected Components
+
+Problems
+
+1. Number of Islands
+2. Clone Graph
+3. Pacific Atlantic Water Flow
+4. Course Schedule
+
+---
+
+15. Topological Sort
+
+When to Use
+
+- Dependency problems
+
+Patterns
+
+- Kahn's Algorithm
+- DFS Topological Sort
+
+Problems
+
+1. Course Schedule I
+2. Course Schedule II
+3. Alien Dictionary
+
+---
+
+16. Union Find (DSU)
+
+When to Use
+
+- Dynamic Connectivity
+
+Problems
+
+1. Number of Provinces
+2. Redundant Connection
+3. Accounts Merge
+
+---
+
+17. Shortest Path
+
+Patterns
+
+- Dijkstra
+- Bellman-Ford
+- Floyd-Warshall
+
+Problems
+
+1. Network Delay Time
+2. Cheapest Flights Within K Stops
+
+---
+
+18. Minimum Spanning Tree (MST)
+
+Patterns
+
+- Kruskal
+- Prim
+
+Problems
+
+1. Min Cost to Connect Points
+
+---
+
+19. Trie
+
+When to Use
+
+- Prefix Search
+
+Problems
+
+1. Implement Trie
+2. Word Search II
+3. Design Add and Search Words Data Structure
+
+---
+
+20. Dynamic Programming (DP)
+
+1D DP
+
+1. Climbing Stairs
+2. House Robber
+3. Coin Change
+
+2D DP
+
+1. Unique Paths
+2. Longest Common Subsequence
+3. Edit Distance
+
+Knapsack DP
+
+1. Target Sum
+2. Partition Equal Subset Sum
+
+Interval DP
+
+1. Burst Balloons
+
+State Machine DP
+
+1. Best Time to Buy and Sell Stock Series
+
+---
+
+21. Bit Manipulation
+
+Patterns
+
+- XOR
+- Bit Masking
+
+Problems
+
+1. Single Number
+2. Counting Bits
+3. Missing Number
+4. Subsets
+
+---
+
+22. Math & Geometry
+
+Problems
+
+1. Rotate Image
+2. Spiral Matrix
+3. Pow(x, n)
+4. Happy Number
+
+---
+
+23. String Algorithms
+
+Patterns
+
+- KMP
+- Rabin-Karp
+- Rolling Hash
+
+Problems
+
+1. Find Index of First Occurrence in a String
+2. Repeated DNA Sequences
+
+---
+
+24. Advanced Patterns
+
+Monotonic Stack
+
+1. Daily Temperatures
+2. Trapping Rain Water
+
+Monotonic Queue
+
+1. Sliding Window Maximum
+
+Prefix Sum
+
+1. Range Sum Query
+2. Subarray Sum Equals K
+
+Difference Array
+
+1. Corporate Flight Bookings
+
+Line Sweep
+
+1. Meeting Rooms II
+
+Bucket Sort
+
+1. Top K Frequent Elements
+2. Maximum Gap
+3. Sort Characters By Frequency
+
+---
+
+Recommended Study Order
+
+1. Arrays & Hashing
+2. Two Pointers
+3. Sliding Window
+4. Stack
+5. Binary Search
+6. Linked List
+7. Trees
+8. Heap / Priority Queue
+9. Backtracking
+10. Graphs
+11. Dynamic Programming
+12. Trie
+13. Union Find (DSU)
+14. Shortest Path
+15. Minimum Spanning Tree (MST)
+16. Advanced Patterns

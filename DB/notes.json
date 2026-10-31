@@ -1,0 +1,56 @@
+[
+  {
+    "userId": "1",
+    "title": "DSA INTERVIEW PREPARATION ROADMAP",
+    "updatedAt": 1785774756,
+    "createdAt": 1785774756,
+    "type": "journal",
+    "id": "11",
+    "bodyFile": "notes/11.txt"
+  },
+  {
+    "userId": "1",
+    "title": "Today Tasks",
+    "updatedAt": 1785774877,
+    "createdAt": 1785774857,
+    "type": "todoList",
+    "id": "12",
+    "bodyFile": "notes/12.txt"
+  },
+  {
+    "userId": "1",
+    "title": "WEIGHT LOSS DIET PLAN (75 KG → 68 KG)",
+    "updatedAt": 1785936532,
+    "createdAt": 1785936532,
+    "type": "journal",
+    "id": "13",
+    "bodyFile": "notes/13.txt"
+  },
+  {
+    "userId": "1",
+    "title": "Untitled",
+    "updatedAt": 1786777493,
+    "createdAt": 1786777493,
+    "type": "quickNotes",
+    "id": "14",
+    "bodyFile": "notes/14.txt"
+  },
+  {
+    "userId": "1",
+    "title": "Things to buy with my adult money",
+    "updatedAt": 1791893173,
+    "createdAt": 1791656611,
+    "type": "shoppingList",
+    "id": "15",
+    "bodyFile": "notes/15.txt"
+  },
+  {
+    "userId": "1",
+    "title": "System Design Resources",
+    "updatedAt": 1793360849,
+    "createdAt": 1793360849,
+    "type": "journal",
+    "id": "16",
+    "bodyFile": "notes/16.txt"
+  }
+]

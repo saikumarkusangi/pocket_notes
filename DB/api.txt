@@ -1,0 +1,39 @@
+GitHub is the mock API. These files are the database.
+
+users.json
+  Collection of users. Same fields the app already posts to /users:
+  id, email, name, photoUrl, googleId.
+
+notes.json
+  Collection of notes. Same fields the app already posts to /notes:
+  id, userId, title, type, createdAt, updatedAt.
+  type is journal, quickNotes, shoppingList, or todoList.
+  createdAt and updatedAt are Unix seconds.
+  bodyFile is the path, under DB/, of the note text.
+
+notes/<id>.txt
+  The note body for that id. Update this file when the text changes.
+  Update notes.json when the title, type, or updatedAt changes.
+
+Read a file
+  GET https://api.github.com/repos/OWNER/REPO/contents/DB/notes.json
+  The response content field is base64. Decode it to get the JSON.
+  Use the raw URL, or header Accept: application/vnd.github.raw, to skip base64.
+
+Update a file
+  1. GET the file and keep the sha from the response.
+  2. PUT the same path with a JSON body:
+     {
+       "message": "Update note body",
+       "content": "<base64 of the new file>",
+       "sha": "<sha from the GET>"
+     }
+  3. Send header Authorization: Bearer <token> and Accept: application/vnd.github+json.
+  The token needs Contents read and write on this repository. Do not commit the token.
+
+Create a file
+  PUT the new path with message and content, and omit sha.
+
+Delete a file
+  DELETE the path with message and sha.
+  Also remove that note from notes.json.

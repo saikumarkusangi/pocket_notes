@@ -1,0 +1,4 @@
+[x] 3 dsa problems
+[ ] learn system design
+[ ] learn development
+[x] apply jobs
