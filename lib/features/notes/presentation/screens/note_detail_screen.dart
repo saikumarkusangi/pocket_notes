@@ -8,7 +8,6 @@ import 'package:pocket_notes/features/notes/presentation/state/note_detail_edito
 import 'package:pocket_notes/features/notes/presentation/widgets/delete_dialog.dart';
 import 'package:pocket_notes/features/notes/presentation/widgets/note_detail_editor_body.dart';
 import 'package:pocket_notes/features/notes/presentation/widgets/note_editor_app_bar.dart';
-import 'package:pocket_notes/features/notes/presentation/widgets/password_vault_gate.dart';
 import 'package:pocket_notes/features/notes/providers/note_detail_editor_provider.dart';
 
 class NoteDetailScreen extends ConsumerStatefulWidget {
@@ -43,7 +42,7 @@ class _NoteDetailScreenState extends ConsumerState<NoteDetailScreen> {
       );
     }
 
-    final screen = Scaffold(
+    return Scaffold(
       backgroundColor: AppColors.white,
       appBar: NoteEditorAppBar(
         appBarColor: Colors.white,
@@ -68,8 +67,6 @@ class _NoteDetailScreenState extends ConsumerState<NoteDetailScreen> {
         ),
       ),
     );
-    if (editorState.category != NoteCategory.passwordManager) return screen;
-    return PasswordVaultGate(child: screen);
   }
 
   void _beginEditing() {

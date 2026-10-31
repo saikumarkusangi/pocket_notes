@@ -9,6 +9,7 @@ import 'package:pocket_notes/core/providers/storage_provider.dart';
 import 'package:pocket_notes/core/providers/theme_provider.dart';
 import 'package:pocket_notes/core/router/app_router.dart';
 import 'package:pocket_notes/features/notes/data/local/hive_notes_storage.dart';
+import 'package:pocket_notes/features/notes/presentation/widgets/password_vault_gate.dart';
 import 'package:pocket_notes/features/notes/providers/notes_offline_provider.dart';
 import 'package:pocket_notes/features/notes/providers/notes_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -53,6 +54,9 @@ class MainApp extends ConsumerWidget {
       darkTheme: ref.watch(darkThemeProvider),
       themeMode: themeMode,
       routerConfig: router,
+      builder: (context, child) {
+        return PasswordVaultGate(child: child ?? const SizedBox.shrink());
+      },
     );
   }
 }

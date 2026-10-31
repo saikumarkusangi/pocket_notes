@@ -15,11 +15,11 @@ class PasswordVaultState {
 
   String get message {
     return switch (status) {
-      BiometricUnlockResult.idle => 'Confirm it\'s you to view saved passwords',
+      BiometricUnlockResult.idle => 'Confirm it\'s you to open Pocket Notes',
       BiometricUnlockResult.success => '',
       BiometricUnlockResult.cancelled => 'Authentication was cancelled',
       BiometricUnlockResult.unavailable =>
-        'Set up face or fingerprint unlock to open your passwords',
+        'Set up face or fingerprint unlock to open Pocket Notes',
       BiometricUnlockResult.failed =>
         'Could not verify your face or fingerprint',
     };

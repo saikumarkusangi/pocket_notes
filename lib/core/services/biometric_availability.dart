@@ -13,10 +13,10 @@ class BiometricAvailability {
 
   String get reason {
     if (hasFace && hasFingerprint) {
-      return 'Use your face or fingerprint to unlock passwords';
+      return 'Use your face or fingerprint to unlock Pocket Notes';
     }
-    if (hasFace) return 'Use your face to unlock passwords';
-    return 'Use your fingerprint to unlock passwords';
+    if (hasFace) return 'Use your face to unlock Pocket Notes';
+    return 'Use your fingerprint to unlock Pocket Notes';
   }
 
   factory BiometricAvailability.fromEnrolled(List<BiometricType> enrolled) {

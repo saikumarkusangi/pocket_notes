@@ -16,7 +16,7 @@ void main() {
       expect(actualAvailability.hasFingerprint, isTrue);
       expect(
         actualAvailability.reason,
-        'Use your face or fingerprint to unlock passwords',
+        'Use your face or fingerprint to unlock Pocket Notes',
       );
     });
 
@@ -29,7 +29,7 @@ void main() {
       expect(actualAvailability.hasFingerprint, isTrue);
       expect(
         actualAvailability.reason,
-        'Use your fingerprint to unlock passwords',
+        'Use your fingerprint to unlock Pocket Notes',
       );
     });
 
@@ -39,22 +39,22 @@ void main() {
       ]);
       expect(actualAvailability.hasFace, isTrue);
       expect(actualAvailability.hasFingerprint, isFalse);
-      expect(actualAvailability.reason, 'Use your face to unlock passwords');
+      expect(actualAvailability.reason, 'Use your face to unlock Pocket Notes');
     });
   });
 
-  group('BiometricAuthService.unlockPasswords', () {
+  group('BiometricAuthService.unlockApp', () {
     test('asks for a biometric when face is enrolled', () async {
       final authenticator = _FakeBiometricAuthenticator(
         enrolled: const [BiometricType.face],
         authenticateResult: true,
       );
       final service = BiometricAuthService(authenticator: authenticator);
-      final actualResult = await service.unlockPasswords();
+      final actualResult = await service.unlockApp();
       expect(actualResult, BiometricUnlockResult.success);
       expect(authenticator.authenticateCalls, 1);
       expect(authenticator.lastBiometricOnly, isTrue);
-      expect(authenticator.lastReason, 'Use your face to unlock passwords');
+      expect(authenticator.lastReason, 'Use your face to unlock Pocket Notes');
     });
 
     test('asks for a biometric when a fingerprint is enrolled', () async {
@@ -62,11 +62,11 @@ void main() {
         enrolled: const [BiometricType.fingerprint],
       );
       final service = BiometricAuthService(authenticator: authenticator);
-      final actualResult = await service.unlockPasswords();
+      final actualResult = await service.unlockApp();
       expect(actualResult, BiometricUnlockResult.cancelled);
       expect(
         authenticator.lastReason,
-        'Use your fingerprint to unlock passwords',
+        'Use your fingerprint to unlock Pocket Notes',
       );
     });
 
@@ -76,7 +76,7 @@ void main() {
         enrolled: const [BiometricType.face],
       );
       final service = BiometricAuthService(authenticator: authenticator);
-      final actualResult = await service.unlockPasswords();
+      final actualResult = await service.unlockApp();
       expect(actualResult, BiometricUnlockResult.unavailable);
       expect(authenticator.authenticateCalls, 0);
     });
@@ -84,7 +84,7 @@ void main() {
     test('does not prompt when face and fingerprint are missing', () async {
       final authenticator = _FakeBiometricAuthenticator();
       final service = BiometricAuthService(authenticator: authenticator);
-      final actualResult = await service.unlockPasswords();
+      final actualResult = await service.unlockApp();
       expect(actualResult, BiometricUnlockResult.unavailable);
       expect(authenticator.authenticateCalls, 0);
     });
@@ -95,7 +95,7 @@ void main() {
         error: const LocalAuthException(code: LocalAuthExceptionCode.userCanceled),
       );
       final service = BiometricAuthService(authenticator: authenticator);
-      final actualResult = await service.unlockPasswords();
+      final actualResult = await service.unlockApp();
       expect(actualResult, BiometricUnlockResult.cancelled);
     });
   });

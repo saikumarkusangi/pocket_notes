@@ -28,7 +28,7 @@ class PasswordVaultNotifier extends Notifier<PasswordVaultState> {
     try {
       final result = await ref
           .read(biometricAuthServiceProvider)
-          .unlockPasswords();
+          .unlockApp();
       state = state.copyWith(
         isUnlocked: result == BiometricUnlockResult.success,
         isChecking: false,

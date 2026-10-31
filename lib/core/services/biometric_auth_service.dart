@@ -22,7 +22,7 @@ class BiometricAuthService {
     }
   }
 
-  Future<BiometricUnlockResult> unlockPasswords() async {
+  Future<BiometricUnlockResult> unlockApp() async {
     final availability = await readAvailability();
     if (!availability.canUnlock) return BiometricUnlockResult.unavailable;
     try {

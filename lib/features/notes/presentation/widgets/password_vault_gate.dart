@@ -27,8 +27,21 @@ class _PasswordVaultGateState extends ConsumerState<PasswordVaultGate> {
       if (next.isUnlocked || next.isChecking) return;
       _prompt();
     });
-    if (vault.isUnlocked) return widget.child;
-    return _PasswordLockView(vault: vault, onUnlock: _prompt);
+    return Stack(
+      children: [
+        IgnorePointer(
+          ignoring: !vault.isUnlocked,
+          child: ExcludeSemantics(
+            excluding: !vault.isUnlocked,
+            child: widget.child,
+          ),
+        ),
+        if (!vault.isUnlocked)
+          Positioned.fill(
+            child: _PasswordLockView(vault: vault, onUnlock: _prompt),
+          ),
+      ],
+    );
   }
 
   Future<void> _prompt() async {
@@ -63,7 +76,7 @@ class _PasswordLockView extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               Text(
-                'Unlock passwords',
+                'Unlock Pocket Notes',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w700,
                   color: const Color(0xFF111111),

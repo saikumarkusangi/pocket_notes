@@ -6,7 +6,6 @@ import 'package:pocket_notes/features/notes/data/models/note_category.dart';
 import 'package:pocket_notes/features/notes/presentation/state/create_note_editor_state.dart';
 import 'package:pocket_notes/features/notes/presentation/widgets/create_note_editor_body.dart';
 import 'package:pocket_notes/features/notes/presentation/widgets/note_editor_app_bar.dart';
-import 'package:pocket_notes/features/notes/presentation/widgets/password_vault_gate.dart';
 import 'package:pocket_notes/features/notes/providers/create_note_editor_provider.dart';
 
 class CreateNoteScreen extends ConsumerWidget {
@@ -23,7 +22,7 @@ class CreateNoteScreen extends ConsumerWidget {
       _handleEditorSideEffects(context, notifier, previous, next);
     });
 
-    final screen = Scaffold(
+    return Scaffold(
       backgroundColor: AppColors.white,
       appBar: NoteEditorAppBar(
         appBarColor: Colors.white,
@@ -39,8 +38,6 @@ class CreateNoteScreen extends ConsumerWidget {
         ),
       ),
     );
-    if (category != NoteCategory.passwordManager) return screen;
-    return PasswordVaultGate(child: screen);
   }
 
   void _handleEditorSideEffects(
