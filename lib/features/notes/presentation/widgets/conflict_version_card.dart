@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pocket_notes/core/constants/app_colors.dart';
+import 'package:pocket_notes/features/notes/presentation/widgets/note_link_text.dart';
 
 class ConflictVersionCard extends StatelessWidget {
   const ConflictVersionCard({
@@ -109,14 +110,15 @@ class ConflictVersionCard extends StatelessWidget {
                     color: Colors.grey.shade100,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Text(
-                    noteBody.isEmpty ? 'No content' : noteBody,
+                  child: NoteLinkText(
+                    text: noteBody.isEmpty ? 'No content' : noteBody,
+                    formatted: true,
+                    maxLines: 12,
+                    overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       height: 1.5,
                       color: Colors.grey.shade800,
                     ),
-                    maxLines: 12,
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
 

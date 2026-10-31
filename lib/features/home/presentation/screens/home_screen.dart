@@ -31,6 +31,9 @@ class HomeScreen extends ConsumerWidget {
     final todoSubtitle = ref.watch(
       homeCategorySubtitleProvider(NoteCategory.todoList),
     );
+    final passwordManagerSubtitle = ref.watch(
+      homeCategorySubtitleProvider(NoteCategory.passwordManager),
+    );
 
     final isOffline = ref.watch(isOfflineProvider);
     final isSyncing = ref.watch(notesSyncingProvider);
@@ -78,6 +81,19 @@ class HomeScreen extends ConsumerWidget {
                         imageBottom: -14,
                         imageRight: -8,
                         onTap: () => context.push(AppConstants.notesListRoute),
+                      ),
+                      const SizedBox(height: 16),
+                      HomeCategoryCard(
+                        title: 'Password Manager',
+                        subtitle: passwordManagerSubtitle,
+                        backgroundColor: Colors.purple.shade100,
+                        imageAsset: AppImages.passwordManager,
+                        imageWidth: 140,
+                        imageHeight: 140,
+                        imageBottom: -20,
+                        imageRight: -20,
+                        onTap: () =>
+                            context.push(AppConstants.passwordManagerRoute),
                       ),
                       const SizedBox(height: 16),
                       HomeCategoryCard(

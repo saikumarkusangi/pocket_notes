@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pocket_notes/core/utils/note_rich_text_controller.dart';
-import 'package:pocket_notes/features/notes/data/models/note_category.dart';import 'package:pocket_notes/features/notes/presentation/state/note_detail_editor_state.dart';
+import 'package:pocket_notes/features/notes/data/models/note_category.dart';
+import 'package:pocket_notes/features/notes/presentation/state/note_detail_editor_state.dart';
 import 'package:pocket_notes/features/notes/presentation/widgets/checklist_note_editor.dart';
 import 'package:pocket_notes/features/notes/presentation/widgets/journal_note_editor.dart';
 import 'package:pocket_notes/features/notes/presentation/widgets/quick_note_editor.dart';
@@ -12,12 +13,14 @@ class NoteDetailEditorBody extends StatefulWidget {
     required this.onTitleChanged,
     required this.onBodyChanged,
     required this.onSave,
+    this.isReadOnly = false,
   });
 
   final NoteDetailEditorState state;
   final ValueChanged<String> onTitleChanged;
   final ValueChanged<String> onBodyChanged;
   final VoidCallback? onSave;
+  final bool isReadOnly;
 
   @override
   State<NoteDetailEditorBody> createState() => _NoteDetailEditorBodyState();
@@ -110,7 +113,8 @@ class _NoteDetailEditorBodyState extends State<NoteDetailEditorBody> {
         onSave: widget.onSave,
         actionButtonColor: actionColor,
         date: widget.state.createdAt,
-        isLoading: widget.state.isSaving ,
+        isLoading: widget.state.isSaving,
+        isReadOnly: widget.isReadOnly,
       ),
       NoteCategory.quickNotes => QuickNoteEditor(
         titleController: _titleController,
@@ -122,6 +126,14 @@ class _NoteDetailEditorBodyState extends State<NoteDetailEditorBody> {
         titleController: _titleController,
         bodyController: _bodyController,
         onSave: widget.onSave,
+      ),
+      NoteCategory.passwordManager => PasswordManagerEditor(
+        titleController: _titleController,
+        bodyController: _bodyController,
+        titleHint: category.createTitleHint,
+        bodyHint: category.createBodyHint,
+        autofocusBody: true,
+        actionButtonColor: actionColor,
       ),
     };
   }

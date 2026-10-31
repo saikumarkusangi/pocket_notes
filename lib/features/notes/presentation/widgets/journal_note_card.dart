@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pocket_notes/core/constants/app_colors.dart';
 import 'package:pocket_notes/core/utils/date_formats.dart' show DateFormats;
-import 'package:pocket_notes/core/utils/note_text_formatter.dart';
 import 'package:pocket_notes/features/notes/data/models/note_model.dart';
+import 'package:pocket_notes/features/notes/presentation/widgets/note_link_text.dart';
 import 'package:pocket_notes/features/notes/presentation/widgets/note_sync_status_badge.dart';
 
 class JournalNoteCard extends StatelessWidget {
@@ -88,16 +88,15 @@ class JournalNoteCard extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 6, 16, 16),
-              child: Text.rich(
-                NoteFormattedText.parse(
-                  note.body.trim().isEmpty ? 'No content yet' : note.body,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.gray,
-                    height: 1.5,
-                  ),
-                ),
+              child: NoteLinkText(
+                text: note.body.trim().isEmpty ? 'No content yet' : note.body,
+                formatted: true,
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.gray,
+                  height: 1.5,
+                ),
               ),
             ),
           ],

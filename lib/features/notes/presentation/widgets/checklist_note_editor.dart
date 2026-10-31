@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pocket_notes/core/constants/app_colors.dart';
 import 'package:pocket_notes/features/notes/data/models/note_category.dart';
+import 'package:pocket_notes/features/notes/presentation/widgets/note_link_text.dart';
 import 'package:pocket_notes/features/notes/presentation/widgets/note_title_field.dart';
 
 class ChecklistNoteEditor extends StatefulWidget {
@@ -160,24 +161,11 @@ class _ChecklistNoteEditorState extends State<ChecklistNoteEditor> {
                         ),
                         const SizedBox(width: 10),
                         Expanded(
-                          child: TextField(
+                          child: _ChecklistItemField(
                             controller: _itemControllers[index],
+                            hintText: itemHint,
+                            isCompleted: _completed[index],
                             autofocus: widget.autofocusBody && index == 0,
-                            decoration: InputDecoration(
-                              hintText: itemHint,
-                              border: InputBorder.none,
-                              isDense: true,
-                            ),
-                            style: Theme.of(context).textTheme.bodyLarge
-                                ?.copyWith(
-                                  decoration: _completed[index]
-                                      ? TextDecoration.lineThrough
-                                      : null,
-                                  color: _completed[index]
-                                      ? Colors.grey.shade500
-                                      : AppColors.text,
-                                  decorationColor: Colors.grey.shade800,
-                                ),
                           ),
                         ),
                         IconButton(
@@ -247,6 +235,43 @@ class _ChecklistNoteEditorState extends State<ChecklistNoteEditor> {
             ),
           ),
       ],
+    );
+  }
+}
+
+class _ChecklistItemField extends StatelessWidget {
+  const _ChecklistItemField({
+    required this.controller,
+    required this.hintText,
+    required this.isCompleted,
+    required this.autofocus,
+  });
+
+  final TextEditingController controller;
+  final String hintText;
+  final bool isCompleted;
+  final bool autofocus;
+
+  @override
+  Widget build(BuildContext context) {
+    final itemStyle = Theme.of(context).textTheme.bodyLarge?.copyWith(
+      decoration: isCompleted ? TextDecoration.lineThrough : null,
+      color: isCompleted ? Colors.grey.shade500 : AppColors.text,
+      decorationColor: Colors.grey.shade800,
+    );
+    return NoteLinkTapLayer(
+      text: () => controller.text,
+      style: itemStyle,
+      child: TextField(
+        controller: controller,
+        autofocus: autofocus,
+        decoration: InputDecoration(
+          hintText: hintText,
+          border: InputBorder.none,
+          isDense: true,
+        ),
+        style: itemStyle,
+      ),
     );
   }
 }

@@ -94,6 +94,16 @@ class CategoryNotesListBody extends StatelessWidget {
           onTap: () => _openNote(context, notes[index]),
         ),
       ),
+      NoteCategory.passwordManager => ListView.separated(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+        itemCount: notes.length,
+        separatorBuilder: (_, __) => const SizedBox(height: 16),
+        itemBuilder: (context, index) => PasswordManagerCard(
+          note: notes[index],
+          onTap: () => _openNote(context, notes[index]),
+        ),
+      ),
     };
   }
 

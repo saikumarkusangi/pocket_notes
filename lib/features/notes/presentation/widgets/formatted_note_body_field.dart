@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pocket_notes/core/constants/app_colors.dart';
 import 'package:pocket_notes/core/utils/note_rich_text_controller.dart';
 import 'package:pocket_notes/core/utils/note_text_formatter.dart';
+import 'package:pocket_notes/features/notes/presentation/widgets/note_link_text.dart';
 
 /// Note body field that renders stacked inline formatting while editing.
 class FormattedNoteBodyField extends StatelessWidget {
@@ -34,39 +35,43 @@ class FormattedNoteBodyField extends StatelessWidget {
       builder: (context, _) {
         final text = controller.text;
 
-        return Stack(
-          alignment: Alignment.topLeft,
-          children: [
-            if (text.isNotEmpty)
-              IgnorePointer(
-                child: Text.rich(
-                  NoteFormattedText.buildFromStyles(
-                    text,
-                    controller.charStyles,
-                    style: style,
+        return NoteLinkTapLayer(
+          text: () => controller.text,
+          style: style,
+          child: Stack(
+            alignment: Alignment.topLeft,
+            children: [
+              if (text.isNotEmpty)
+                IgnorePointer(
+                  child: Text.rich(
+                    NoteFormattedText.buildFromStyles(
+                      text,
+                      controller.charStyles,
+                      style: style,
+                    ),
+                    textAlign: TextAlign.start,
                   ),
-                  textAlign: TextAlign.start,
+                ),
+              TextField(
+                controller: controller,
+                autofocus: autofocus,
+                maxLines: null,
+                keyboardType: TextInputType.multiline,
+                cursorColor: AppColors.text,
+                style: style.copyWith(
+                  color: Colors.transparent,
+                  decorationColor: Colors.transparent,
+                ),
+                decoration: InputDecoration(
+                  hintText: hintText,
+                  hintStyle: hintStyle,
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.zero,
+                  isDense: true,
                 ),
               ),
-            TextField(
-              controller: controller,
-              autofocus: autofocus,
-              maxLines: null,
-              keyboardType: TextInputType.multiline,
-              cursorColor: AppColors.text,
-              style: style.copyWith(
-                color: Colors.transparent,
-                decorationColor: Colors.transparent,
-              ),
-              decoration: InputDecoration(
-                hintText: hintText,
-                hintStyle: hintStyle,
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.zero,
-                isDense: true,
-              ),
-            ),
-          ],
+            ],
+          ),
         );
       },
     );

@@ -1,5 +1,7 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:pocket_notes/core/utils/note_char_style.dart';
+import 'package:pocket_notes/core/utils/note_links.dart';
 
 /// Parses, serializes, and renders journal note formatting markers.
 class NoteFormattedText {
@@ -8,12 +10,16 @@ class NoteFormattedText {
   static final _patterns = <_FormatPattern>[
     _FormatPattern(
       RegExp(r'<c:([0-9A-Fa-f]{6})>(.*?)</c>', dotAll: true),
-      (match, base) {
+      (match, base, recognizeLink) {
         final color = Color(int.parse('FF${match.group(1)!}', radix: 16));
         final innerStyle = base?.copyWith(color: color);
         return TextSpan(
           style: innerStyle,
-          children: _parseNodes(match.group(2)!, innerStyle),
+          children: _parseNodes(
+            match.group(2)!,
+            innerStyle,
+            recognizeLink: recognizeLink,
+          ),
         );
       },
       (style, match) => style.copyWith(
@@ -23,14 +29,18 @@ class NoteFormattedText {
     ),
     _FormatPattern(
       RegExp(r'<h:([0-9A-Fa-f]{6})>(.*?)</h>', dotAll: true),
-      (match, base) {
+      (match, base, recognizeLink) {
         final color = Color(int.parse('FF${match.group(1)!}', radix: 16));
         final innerStyle = base?.copyWith(
           backgroundColor: color.withValues(alpha: 0.45),
         );
         return TextSpan(
           style: innerStyle,
-          children: _parseNodes(match.group(2)!, innerStyle),
+          children: _parseNodes(
+            match.group(2)!,
+            innerStyle,
+            recognizeLink: recognizeLink,
+          ),
         );
       },
       (style, match) => style.copyWith(
@@ -40,11 +50,15 @@ class NoteFormattedText {
     ),
     _FormatPattern(
       RegExp(r'\*\*(.*?)\*\*', dotAll: true),
-      (match, base) {
+      (match, base, recognizeLink) {
         final innerStyle = base?.copyWith(fontWeight: FontWeight.w700);
         return TextSpan(
           style: innerStyle,
-          children: _parseNodes(match.group(1)!, innerStyle),
+          children: _parseNodes(
+            match.group(1)!,
+            innerStyle,
+            recognizeLink: recognizeLink,
+          ),
         );
       },
       (style, _) => style.copyWith(bold: true),
@@ -52,11 +66,15 @@ class NoteFormattedText {
     ),
     _FormatPattern(
       RegExp(r'_(.*?)_', dotAll: true),
-      (match, base) {
+      (match, base, recognizeLink) {
         final innerStyle = base?.copyWith(fontStyle: FontStyle.italic);
         return TextSpan(
           style: innerStyle,
-          children: _parseNodes(match.group(1)!, innerStyle),
+          children: _parseNodes(
+            match.group(1)!,
+            innerStyle,
+            recognizeLink: recognizeLink,
+          ),
         );
       },
       (style, _) => style.copyWith(italic: true),
@@ -64,11 +82,24 @@ class NoteFormattedText {
     ),
   ];
 
-  static TextSpan parse(String text, {TextStyle? style}) {
-    return TextSpan(
-      style: style,
-      children: _parseNodes(text, style),
-    );
+  static bool _openLinksOnTap = false;
+
+  static TextSpan parse(
+    String text, {
+    TextStyle? style,
+    GestureRecognizer? Function(String url)? recognizeLink,
+    bool openOnTap = false,
+  }) {
+    final previousOpenOnTap = _openLinksOnTap;
+    _openLinksOnTap = openOnTap;
+    try {
+      return TextSpan(
+        style: style,
+        children: _parseNodes(text, style, recognizeLink: recognizeLink),
+      );
+    } finally {
+      _openLinksOnTap = previousOpenOnTap;
+    }
   }
 
   static TextSpan buildFromStyles(
@@ -85,16 +116,14 @@ class NoteFormattedText {
 
     for (var i = 1; i <= plain.length; i++) {
       final isRunEnd =
-          i == plain.length || !_styleAt(styles, i).sameAs(_styleAt(styles, runStart));
+          i == plain.length ||
+          !_styleAt(styles, i).sameAs(_styleAt(styles, runStart));
       if (!isRunEnd) continue;
 
       final chunk = plain.substring(runStart, i);
       final charStyle = _styleAt(styles, runStart);
-      children.add(
-        TextSpan(
-          text: chunk,
-          style: _toTextStyle(style, charStyle),
-        ),
+      children.addAll(
+        NoteLinks.buildSpans(chunk, _toTextStyle(style, charStyle)),
       );
       runStart = i;
     }
@@ -110,7 +139,8 @@ class NoteFormattedText {
 
     for (var i = 1; i <= plain.length; i++) {
       final isRunEnd =
-          i == plain.length || !_styleAt(styles, i).sameAs(_styleAt(styles, runStart));
+          i == plain.length ||
+          !_styleAt(styles, i).sameAs(_styleAt(styles, runStart));
       if (!isRunEnd) continue;
 
       var chunk = plain.substring(runStart, i);
@@ -136,21 +166,33 @@ class NoteFormattedText {
     return deserialize(text).plainText;
   }
 
-  static List<InlineSpan> _parseNodes(String text, TextStyle? style) {
+  static List<InlineSpan> _parseNodes(
+    String text,
+    TextStyle? style, {
+    GestureRecognizer? Function(String url)? recognizeLink,
+  }) {
     if (text.isEmpty) return [const TextSpan(text: '')];
-
     final match = _findEarliestMatch(text);
     if (match == null) {
-      return [TextSpan(text: text, style: style)];
+      return NoteLinks.buildSpans(
+        text,
+        style,
+        recognizeLink: recognizeLink,
+        openOnTap: _openLinksOnTap,
+      );
     }
-
     final before = text.substring(0, match.start);
     final after = text.substring(match.end);
-
     return [
-      if (before.isNotEmpty) TextSpan(text: before, style: style),
-      match.builder(match.match, style),
-      ..._parseNodes(after, style),
+      if (before.isNotEmpty)
+        ...NoteLinks.buildSpans(
+          before,
+          style,
+          recognizeLink: recognizeLink,
+          openOnTap: _openLinksOnTap,
+        ),
+      match.builder(match.match, style, recognizeLink),
+      ..._parseNodes(after, style, recognizeLink: recognizeLink),
     ];
   }
 
@@ -231,13 +273,19 @@ class NoteFormattedText {
     return value.toRadixString(16).padLeft(6, '0').toUpperCase();
   }
 
+  static RegExpMatch? _firstMatchOutsideLink(String text, RegExp regex) {
+    for (final match in regex.allMatches(text)) {
+      if (!NoteLinks.isInsideLink(text, match.start, match.end)) return match;
+    }
+    return null;
+  }
+
   static _FormatMatch? _findEarliestMatch(String text) {
     _FormatMatch? earliest;
 
     for (final pattern in _patterns) {
-      final match = pattern.regex.firstMatch(text);
+      final match = _firstMatchOutsideLink(text, pattern.regex);
       if (match == null) continue;
-
       final candidate = _FormatMatch(
         start: match.start,
         end: match.end,
@@ -246,7 +294,6 @@ class NoteFormattedText {
         applyStyle: pattern.applyStyle,
         groupIndex: pattern.groupIndex,
       );
-
       if (earliest == null || candidate.start < earliest.start) {
         earliest = candidate;
       }
@@ -265,7 +312,12 @@ class _FormatPattern {
   });
 
   final RegExp regex;
-  final TextSpan Function(RegExpMatch match, TextStyle? base) builder;
+  final TextSpan Function(
+    RegExpMatch match,
+    TextStyle? base,
+    GestureRecognizer? Function(String url)? recognizeLink,
+  )
+  builder;
   final NoteCharStyle Function(NoteCharStyle style, RegExpMatch match)
   applyStyle;
   final int groupIndex;
@@ -284,7 +336,12 @@ class _FormatMatch {
   final int start;
   final int end;
   final RegExpMatch match;
-  final TextSpan Function(RegExpMatch match, TextStyle? base) builder;
+  final TextSpan Function(
+    RegExpMatch match,
+    TextStyle? base,
+    GestureRecognizer? Function(String url)? recognizeLink,
+  )
+  builder;
   final NoteCharStyle Function(NoteCharStyle style, RegExpMatch match)
   applyStyle;
   final int groupIndex;

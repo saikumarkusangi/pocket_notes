@@ -100,6 +100,14 @@ class _CreateNoteEditorBodyState extends State<CreateNoteEditorBody> {
         autofocusBody: true,
         onSave: widget.onSave,
       ),
+      NoteCategory.passwordManager => PasswordManagerEditor(
+        titleController: _titleController,
+        bodyController: _bodyController,
+        titleHint: category.createTitleHint,
+        bodyHint: category.createBodyHint,
+        autofocusBody: true,
+        actionButtonColor: actionColor,
+      ),
     };
   }
 }

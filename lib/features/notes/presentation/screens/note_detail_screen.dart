@@ -3,21 +3,32 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pocket_notes/core/constants/app_colors.dart';
 import 'package:pocket_notes/core/constants/app_constants.dart';
+import 'package:pocket_notes/features/notes/data/models/note_category.dart';
 import 'package:pocket_notes/features/notes/presentation/state/note_detail_editor_state.dart';
 import 'package:pocket_notes/features/notes/presentation/widgets/delete_dialog.dart';
 import 'package:pocket_notes/features/notes/presentation/widgets/note_detail_editor_body.dart';
 import 'package:pocket_notes/features/notes/presentation/widgets/note_editor_app_bar.dart';
 import 'package:pocket_notes/features/notes/providers/note_detail_editor_provider.dart';
 
-class NoteDetailScreen extends ConsumerWidget {
+class NoteDetailScreen extends ConsumerStatefulWidget {
   const NoteDetailScreen({super.key, required this.noteId});
 
   final String noteId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<NoteDetailScreen> createState() => _NoteDetailScreenState();
+}
+
+class _NoteDetailScreenState extends ConsumerState<NoteDetailScreen> {
+  bool _isEditing = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final noteId = widget.noteId;
     final editorState = ref.watch(noteDetailEditorProvider(noteId));
     final notifier = ref.read(noteDetailEditorProvider(noteId).notifier);
+    final isViewOnly =
+        editorState.category == NoteCategory.journal && !_isEditing;
 
     ref.listen(noteDetailEditorProvider(noteId), (previous, next) {
       _handleEditorSideEffects(context, ref, previous, next);
@@ -31,7 +42,6 @@ class NoteDetailScreen extends ConsumerWidget {
       );
     }
 
-
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: NoteEditorAppBar(
@@ -40,8 +50,12 @@ class NoteDetailScreen extends ConsumerWidget {
             ? null
             : () => _showDeleteDialog(context, notifier.delete),
         actionButtonText: 'Delete',
-        secondaryActionButtonTap: editorState.isSaving ? null : notifier.save,
-        secondaryActionButtonText: 'Save',
+        secondaryActionButtonTap: editorState.isSaving
+            ? null
+            : isViewOnly
+            ? _beginEditing
+            : notifier.save,
+        secondaryActionButtonText: isViewOnly ? 'Edit' : 'Save',
       ),
       body: SafeArea(
         child: NoteDetailEditorBody(
@@ -49,9 +63,14 @@ class NoteDetailScreen extends ConsumerWidget {
           onTitleChanged: notifier.updateTitle,
           onBodyChanged: notifier.updateBody,
           onSave: editorState.isSaving ? null : notifier.save,
+          isReadOnly: isViewOnly,
         ),
       ),
     );
+  }
+
+  void _beginEditing() {
+    setState(() => _isEditing = true);
   }
 
   void _showDeleteDialog(
@@ -70,7 +89,9 @@ class NoteDetailScreen extends ConsumerWidget {
     NoteDetailEditorState? previous,
     NoteDetailEditorState next,
   ) {
-    final notifier = ref.read(noteDetailEditorProvider(noteId).notifier);
+    final notifier = ref.read(
+      noteDetailEditorProvider(widget.noteId).notifier,
+    );
 
     if (next.errorMessage != null &&
         next.errorMessage != previous?.errorMessage) {

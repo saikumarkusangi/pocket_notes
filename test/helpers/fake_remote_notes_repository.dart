@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:pocket_notes/features/notes/data/models/note_category.dart';
 import 'package:pocket_notes/features/notes/data/models/note_model.dart';
 import 'package:pocket_notes/features/notes/data/models/note_sync_status.dart';
@@ -70,8 +69,7 @@ class FakeRemoteNotesRepository {
 
 /// Sync service test double that delegates to [FakeRemoteNotesRepository].
 class TestableRemoteNotesRepository extends RemoteNotesRepository {
-  TestableRemoteNotesRepository(this.fake)
-    : super(Dio(BaseOptions(baseUrl: 'http://test')));
+  TestableRemoteNotesRepository(this.fake) : super.forTest();
 
   final FakeRemoteNotesRepository fake;
 

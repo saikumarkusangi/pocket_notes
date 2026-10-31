@@ -6,7 +6,8 @@ class AppConstants {
       'Pocket Notes keeps your ideas safe and within reach even when you’re offline.';
   static const String appTagline = 'Think 🤔 ➜ Write ✍️ ➜ Sync 🔄';
 
-  // API Constants
+  // Legacy MockAPI base URL. Notes and users are stored in DB/ and
+  // updated through the GitHub Contents API.
   static const String apiBaseUrl =
       'https://6a2e5b5cc9776ca6c0c486fe.mockapi.io/api/v1';
 
@@ -40,6 +41,7 @@ class AppConstants {
   static const String quickNotesListRoute = '/quick-notes';
   static const String shoppingListRoute = '/shopping-list';
   static const String todoListRoute = '/todo-list';
+  static const String passwordManagerRoute = '/password-manager';
   static const String createNoteRoute = '/create_note';
   static const String noteDetailRoute = '/note_detail';
   static const String editNoteRoute = '/edit_note';

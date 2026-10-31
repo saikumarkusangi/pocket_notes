@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pocket_notes/core/constants/app_colors.dart';
 import 'package:pocket_notes/features/notes/data/models/note_model.dart';
+import 'package:pocket_notes/features/notes/presentation/widgets/note_link_text.dart';
 import 'package:pocket_notes/features/notes/presentation/widgets/note_sync_status_badge.dart';
 
 class TodoListCard extends StatelessWidget {
@@ -160,8 +161,8 @@ class _TodoPreviewRow extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(
-              label,
+            child: NoteLinkText(
+              text: label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(

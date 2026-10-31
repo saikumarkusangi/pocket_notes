@@ -1,22 +1,21 @@
-import 'package:dio/dio.dart';
-import 'package:pocket_notes/core/constants/api_endpoints.dart';
+import 'package:pocket_notes/core/network/github_database.dart';
 import 'package:pocket_notes/features/auth/data/models/google_auth_result.dart';
 import 'package:pocket_notes/features/auth/data/models/user_model.dart';
 
 class UserRepository {
-  UserRepository(this._dio);
+  UserRepository(this._database);
 
-  final Dio _dio;
+  final GithubDatabase _database;
+  static final String _usersPath = githubDatabasePath('users.json');
 
-  Future<UserModel?> findUserByEmail(String email) async {
-    final response = await _dio.get<List<dynamic>>(
-      ApiEndpoints.users,
-      queryParameters: {'email': email},
-    );
-
-    final users = _parseUsers(response.data);
-    final match = users.where((user) => user.email == email);
-    return match.isEmpty ? null : match.first;
+  Future<UserModel?> findUserByEmail(String email) {
+    return _database.run((session) async {
+      final users = await session.readJsonList(_usersPath);
+      for (final user in users) {
+        if (user['email'] == email) return UserModel.fromJson(user);
+      }
+      return null;
+    });
   }
 
   Future<UserModel> createUser({
@@ -24,40 +23,35 @@ class UserRepository {
     String? name,
     String? photoUrl,
     String? googleId,
-  }) async {
-    final response = await _dio.post<Map<String, dynamic>>(
-      ApiEndpoints.users,
-      data: {
+  }) {
+    return _database.run((session) async {
+      final users = await session.readJsonList(_usersPath);
+      final record = <String, dynamic>{
+        'id': nextRecordId(users),
         'email': email,
-        if (name != null) 'name': name,
-        if (photoUrl != null) 'photoUrl': photoUrl,
-        if (googleId != null) 'googleId': googleId,
-      },
-    );
-
-    return UserModel.fromJson(response.data ?? {});
+        'name': name,
+        'photoUrl': photoUrl,
+        'googleId': googleId,
+        'createdAt': DateTime.now().millisecondsSinceEpoch ~/ 1000,
+      };
+      users.add(record);
+      await session.writeJsonList(
+        path: _usersPath,
+        records: users,
+        message: 'Add user ${record['id']}',
+      );
+      return UserModel.fromJson(record);
+    });
   }
 
   Future<UserModel> syncUserAfterLogin(GoogleAuthUser googleUser) async {
     final existingUser = await findUserByEmail(googleUser.email);
-    if (existingUser != null) {
-      return existingUser;
-    }
-
+    if (existingUser != null) return existingUser;
     return createUser(
       email: googleUser.email,
       name: googleUser.displayName,
       photoUrl: googleUser.photoUrl,
       googleId: googleUser.id,
     );
-  }
-
-  List<UserModel> _parseUsers(List<dynamic>? data) {
-    if (data == null) return [];
-
-    return data
-        .whereType<Map<String, dynamic>>()
-        .map(UserModel.fromJson)
-        .toList();
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pocket_notes/core/constants/app_colors.dart';
+import 'package:pocket_notes/features/notes/presentation/widgets/note_link_text.dart';
 
 class NoteBodyField extends StatelessWidget {
   const NoteBodyField({
@@ -17,27 +18,32 @@ class NoteBodyField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      readOnly: readOnly,
-      autofocus: autofocus,
-      maxLines: null,
-      keyboardType: TextInputType.multiline,
-      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-        color: AppColors.text,
-        height: 1.6,
-        fontSize: 16,
-      ),
-      decoration: InputDecoration(
-        hintText: hintText,
-        hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
-          color: AppColors.gray,
-          height: 1.6,
-          fontSize: 16,
+    final style = Theme.of(context).textTheme.bodyLarge?.copyWith(
+      color: AppColors.text,
+      height: 1.6,
+      fontSize: 16,
+    );
+    return NoteLinkTapLayer(
+      text: () => controller.text,
+      style: style,
+      child: TextField(
+        controller: controller,
+        readOnly: readOnly,
+        autofocus: autofocus,
+        maxLines: null,
+        keyboardType: TextInputType.multiline,
+        style: style,
+        decoration: InputDecoration(
+          hintText: hintText,
+          hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
+            color: AppColors.gray,
+            height: 1.6,
+            fontSize: 16,
+          ),
+          border: InputBorder.none,
+          contentPadding: EdgeInsets.zero,
+          isDense: true,
         ),
-        border: InputBorder.none,
-        contentPadding: EdgeInsets.zero,
-        isDense: true,
       ),
     );
   }

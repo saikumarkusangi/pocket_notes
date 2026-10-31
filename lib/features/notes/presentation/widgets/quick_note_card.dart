@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pocket_notes/core/constants/app_colors.dart';
+import 'package:pocket_notes/core/utils/note_text_formatter.dart';
 import 'package:pocket_notes/features/notes/data/models/note_model.dart';
+import 'package:pocket_notes/features/notes/presentation/widgets/note_link_text.dart';
 import 'package:pocket_notes/features/notes/presentation/widgets/note_sync_status_badge.dart';
 
 class QuickNoteCard extends StatelessWidget {
@@ -14,6 +16,12 @@ class QuickNoteCard extends StatelessWidget {
   final NoteModel note;
   final Color color;
   final VoidCallback? onTap;
+
+  static String _previewText(NoteModel note) {
+    final plain = NoteFormattedText.stripMarkers(note.body.trim());
+    if (plain.isEmpty) return 'No content yet';
+    return plain;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,15 +45,14 @@ class QuickNoteCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              child: Text(
-                note.preview,
+              child: NoteLinkText(
+                text: _previewText(note),
                 maxLines: 5,
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: AppColors.border,
                   height: 1.4,
                   fontSize: 14,
-                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ),
