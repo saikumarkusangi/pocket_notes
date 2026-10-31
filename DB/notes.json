@@ -115,5 +115,14 @@
     "bodyFile": "notes/23.txt",
     "createdAt": 1793477878,
     "updatedAt": 1793477878
+  },
+  {
+    "id": "24",
+    "userId": "1",
+    "title": "Things to do in Bangalore",
+    "type": "todoList",
+    "bodyFile": "notes/24.txt",
+    "createdAt": 1793479398,
+    "updatedAt": 1793479398
   }
 ]
