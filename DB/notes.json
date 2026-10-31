@@ -52,5 +52,14 @@
     "type": "journal",
     "id": "16",
     "bodyFile": "notes/16.txt"
+  },
+  {
+    "id": "17",
+    "userId": "1",
+    "title": "Github",
+    "type": "passwordManager",
+    "bodyFile": "notes/17.txt",
+    "createdAt": 1793475477,
+    "updatedAt": 1793475477
   }
 ]
