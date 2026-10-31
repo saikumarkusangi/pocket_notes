@@ -70,5 +70,14 @@
     "bodyFile": "notes/18.txt",
     "createdAt": 1793477352,
     "updatedAt": 1793477352
+  },
+  {
+    "id": "19",
+    "userId": "1",
+    "title": "Vanguard Crewnet",
+    "type": "passwordManager",
+    "bodyFile": "notes/19.txt",
+    "createdAt": 1793477461,
+    "updatedAt": 1793477461
   }
 ]
