@@ -124,5 +124,14 @@
     "bodyFile": "notes/24.txt",
     "createdAt": 1793479850,
     "updatedAt": 1793482501
+  },
+  {
+    "id": "25",
+    "userId": "1",
+    "title": "Outlook",
+    "type": "passwordManager",
+    "bodyFile": "notes/25.txt",
+    "createdAt": 1793563313,
+    "updatedAt": 1793563313
   }
 ]
