@@ -133,5 +133,14 @@
     "bodyFile": "notes/25.txt",
     "createdAt": 1793563313,
     "updatedAt": 1793563313
+  },
+  {
+    "id": "26",
+    "userId": "1",
+    "title": "Skanda Cars Vps",
+    "type": "passwordManager",
+    "bodyFile": "notes/26.txt",
+    "createdAt": 1793817687,
+    "updatedAt": 1793817687
   }
 ]
