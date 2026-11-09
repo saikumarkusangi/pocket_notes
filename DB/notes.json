@@ -142,5 +142,14 @@
     "bodyFile": "notes/26.txt",
     "createdAt": 1793817687,
     "updatedAt": 1793857648
+  },
+  {
+    "id": "27",
+    "userId": "1",
+    "title": "Netflix",
+    "type": "passwordManager",
+    "bodyFile": "notes/27.txt",
+    "createdAt": 1794233957,
+    "updatedAt": 1794233957
   }
 ]
